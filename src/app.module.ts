@@ -12,6 +12,8 @@ import { Hint } from "./hints/models/hint.models";
 import { Subscription } from "./subscriptions/models/subscription.model";
 import Group from "./groups/models/group.model";
 import { HintUsers } from "./hints/models/hintUsers.model";
+import { AuthModule } from "./auth/auth.module";
+import { TokenModule } from "./token/token.module";
 
 @Module({
   controllers: [],
@@ -35,6 +37,8 @@ import { HintUsers } from "./hints/models/hintUsers.model";
     HintsModule,
     SubscriptionsModule,
     TransactionsModule,
+    AuthModule,
+    TokenModule,
   ],
 })
 export class AppModule {}

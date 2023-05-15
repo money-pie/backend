@@ -8,10 +8,11 @@ import { HintUsers } from "src/hints/models/hintUsers.model";
 import Group from "src/groups/models/group.model";
 import { Subscription } from "src/subscriptions/models/subscription.model";
 import { Transaction } from "src/transactions/models/transaction.model";
+import { JwtStrategy } from "src/auth/strategies/jwt.strategy";
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, JwtStrategy],
   imports: [
     SequelizeModule.forFeature([
       User,
@@ -22,5 +23,6 @@ import { Transaction } from "src/transactions/models/transaction.model";
       Transaction,
     ]),
   ],
+  exports: [UsersService],
 })
 export class UsersModule {}
