@@ -1,0 +1,96 @@
+version: '3.9'
+
+services:
+  moneypie.api:
+    env_file:
+      - .env
+    image: pustart/money-pie-api:latest
+    container_name: moneypie-api
+    build: .
+    restart: always
+    ports:
+      - "$PORT:$PORT"
+    networks:
+      - money-pie
+    depends_on:
+      - postgres
+
+  postgres:
+    image: "postgres:13.3"
+    container_name: postgre-db
+    platform: linux/amd64 #for platform error on Apple M1 chips
+    env_file:
+      - .env
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=50"
+      - "-c"
+      - "shared_buffers=1GB"
+      - "-c"
+      - "effective_cache_size=4GB"
+      - "-c"
+      - "work_mem=16MB"
+      - "-c"
+      - "maintenance_work_mem=512MB"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "temp_file_limit=10GB"
+      - "-c"
+      - "log_min_duration_statement=200ms"
+      - "-c"
+      - "idle_in_transaction_session_timeout=10s"
+      - "-c"
+      - "lock_timeout=1s"
+      - "-c"
+      - "statement_timeout=60s"
+      - "-c"
+      - "shared_preload_libraries=pg_stat_statements"
+      - "-c"
+      - "pg_stat_statements.max=10000"
+      - "-c"
+      - "pg_stat_statements.track=all"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - "./init_scripts:/docker-entrypoint-initdb.d:ro"
+      - "pgdata:/var/lib/postgresql/data:rw"
+    ports:
+      - "$POSTGRES_PORT:$POSTGRES_PORT"
+    networks:
+      - money-pie
+    restart: on-failure
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_PASSWORD}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:7.1
+    env_file:
+      - .env
+    volumes:
+       - pgadmin:/root/.pgadmin
+    ports:
+      - 8080:80
+    networks:
+      - money-pie
+    restart: on-failure
+
+networks:
+  money-pie:
+    driver: bridge
+
+volumes:
+  pgdata:
+  pgadmin:

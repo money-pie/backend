@@ -5,7 +5,7 @@ import {
   Model,
   Table,
 } from "sequelize-typescript";
-import { User } from "src/users/models/user.model";
+import { User } from "../../users/models/user.model";
 import { Hint } from "./hint.models";
 
 @Table({ tableName: "hint_users", underscored: true, timestamps: false })

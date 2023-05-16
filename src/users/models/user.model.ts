@@ -9,11 +9,11 @@ import {
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
-import Group from "src/groups/models/group.model";
-import { Hint } from "src/hints/models/hint.models";
-import { HintUsers } from "src/hints/models/hintUsers.model";
-import { Subscription } from "src/subscriptions/models/subscription.model";
-import { Transaction } from "src/transactions/models/transaction.model";
+import Group from "../../groups/models/group.model";
+import { Hint } from "../../hints/models/hint.models";
+import { HintUsers } from "../../hints/models/hintUsers.model";
+import { Subscription } from "../../subscriptions/models/subscription.model";
+import { Transaction } from "../../transactions/models/transaction.model";
 
 interface UserCreationAttrs {
   email: string;

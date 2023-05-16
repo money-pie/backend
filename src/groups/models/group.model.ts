@@ -6,8 +6,8 @@ import {
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
-import { Transaction } from "src/transactions/models/transaction.model";
-import { User } from "src/users/models/user.model";
+import { Transaction } from "../../transactions/models/transaction.model";
+import { User } from "../../users/models/user.model";
 
 interface GroupCreationAttrs {
   premium: boolean;

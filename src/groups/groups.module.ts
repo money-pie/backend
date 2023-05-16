@@ -3,7 +3,7 @@ import { GroupsService } from "./groups.service";
 import { GroupsController } from "./groups.controller";
 import { SequelizeModule } from "@nestjs/sequelize";
 import Group from "./models/group.model";
-import { Transaction } from "src/transactions/models/transaction.model";
+import { Transaction } from "../transactions/models/transaction.model";
 
 @Module({
   controllers: [GroupsController],

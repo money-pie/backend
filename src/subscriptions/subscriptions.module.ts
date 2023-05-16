@@ -3,7 +3,7 @@ import { SubscriptionsService } from "./subscriptions.service";
 import { SubscriptionsController } from "./subscriptions.controller";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { Subscription } from "./models/subscription.model";
-import { User } from "src/users/models/user.model";
+import { User } from "../users/models/user.model";
 
 @Module({
   controllers: [SubscriptionsController],
