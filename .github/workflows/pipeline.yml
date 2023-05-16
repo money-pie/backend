@@ -29,7 +29,7 @@ jobs:
       - name: Test
         run: npm run test
   build:
-    needs: [unt_tests]
+    needs: [unit_tests]
     runs-on: ubuntu-18.04
     steps:
       - name: Set up QEMU
