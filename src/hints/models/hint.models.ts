@@ -6,7 +6,7 @@ import {
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
-import { User } from "src/users/models/user.model";
+import { User } from "../../users/models/user.model";
 import { Theme } from "../hints.constants";
 import { HintUsers } from "./hintUsers.model";
 

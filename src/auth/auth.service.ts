@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { UnauthorizedException } from "@nestjs/common/exceptions";
-import { CreateUserDto } from "src/users/dto/create-user.dto";
-import { UsersService } from "src/users/users.service";
+import { CreateUserDto } from "../users/dto/create-user.dto";
+import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcryptjs";
 import { USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from "./auth.constants";
 import { BadRequestException } from "@nestjs/common/exceptions/bad-request.exception";
-import { TokenService } from "src/token/token.service";
+import { TokenService } from "../token/token.service";
 
 @Injectable()
 export class AuthService {

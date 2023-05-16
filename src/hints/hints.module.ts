@@ -3,7 +3,7 @@ import { HintsService } from "./hints.service";
 import { HintsController } from "./hints.controller";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { Hint } from "./models/hint.models";
-import { User } from "src/users/models/user.model";
+import { User } from "../users/models/user.model";
 import { HintUsers } from "./models/hintUsers.model";
 
 @Module({
