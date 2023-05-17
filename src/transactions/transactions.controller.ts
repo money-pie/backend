@@ -24,4 +24,10 @@ export class TransactionsController {
     const user = req.user;
     return this.transactionsService.create(createTransactionDto, user);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("/:id")
+  findOne(@Param("id") id: string) {
+    return this.transactionsService.findOneById(id);
+  }
 }

@@ -31,12 +31,16 @@ export class TransactionsService {
     }
   }
 
-  findAll() {
-    return `This action returns all transactions`;
+  async findOneById(id: string) {
+    try {
+      return this.transactionRepository.findByPk(id);
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
+  findAll() {
+    return `This action returns all transactions`;
   }
 
   update(id: number, updateTransactionDto: UpdateTransactionDto) {
