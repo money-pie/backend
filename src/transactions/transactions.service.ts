@@ -1,11 +1,34 @@
 import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/sequelize";
+import { User } from "src/users/models/user.model";
+import { UsersService } from "src/users/users.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { UpdateTransactionDto } from "./dto/update-transaction.dto";
+import { Transaction } from "./models/transaction.model";
 
 @Injectable()
 export class TransactionsService {
-  create(createTransactionDto: CreateTransactionDto) {
-    return "This action adds a new transaction";
+  constructor(
+    @InjectModel(Transaction) private transactionRepository: typeof Transaction,
+    private readonly userService: UsersService,
+  ) {}
+
+  async create(createTransactionDto, user) {
+    try {
+      const { id, groupId } = await this.userService.findOne(user);
+      const transaction = {
+        sum: createTransactionDto.sum,
+        category: createTransactionDto.category,
+        date: createTransactionDto.date,
+        personal: createTransactionDto.personal,
+        description: createTransactionDto.description,
+        userId: id,
+        groupId: createTransactionDto.personal ? null : groupId,
+      };
+      return this.transactionRepository.create(transaction);
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
   findAll() {

@@ -42,10 +42,10 @@ export class Transaction extends Model<Transaction, TransactionCreationAttrs> {
   })
   category: Category;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE, allowNull: false, defaultValue: DataType.NOW })
   date: Date;
 
-  @Column({ type: DataType.TIME, allowNull: false })
+  @Column({ type: DataType.TIME })
   time: Date;
 
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: true })
