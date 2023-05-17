@@ -9,6 +9,7 @@ import Group from "../groups/models/group.model";
 import { Subscription } from "../subscriptions/models/subscription.model";
 import { Transaction } from "../transactions/models/transaction.model";
 import { JwtStrategy } from "../auth/strategies/jwt.strategy";
+import { TokenModule } from "../token/token.module";
 
 @Module({
   controllers: [UsersController],
@@ -22,6 +23,7 @@ import { JwtStrategy } from "../auth/strategies/jwt.strategy";
       Subscription,
       Transaction,
     ]),
+    TokenModule,
   ],
   exports: [UsersService],
 })

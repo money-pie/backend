@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./models/user.model";
 import * as bcrypt from "bcryptjs";
 
@@ -14,36 +13,52 @@ export class UsersService {
     return user;
   }
 
-  async findAll() {
-    const users = await this.userRepository.findAll();
-    return users;
+  async findOne(user) {
+    try {
+      return this.userRepository.findByPk(user.id, {
+        attributes: {
+          exclude: ["password", "createdAt", "updatedAt"],
+        },
+      });
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
-  async findOne(id: number) {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      include: { all: true },
-    });
-    return user;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async setNotifications(user): Promise<any> {
+    try {
+      const { notification } = await this.findOne(user);
+      const turnedNotification = false;
+      const data = {
+        notification: true,
+      };
+      if (notification) {
+        data.notification = turnedNotification;
+      }
+      return this.userRepository.update(data, {
+        where: { id: user.id },
+      });
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
   async getUserByEmail(email: string) {
-    const user = await this.userRepository.findOne({
-      where: { email },
-      include: { all: true },
-    });
-    return user;
+    try {
+      return this.userRepository.findOne({
+        where: { email },
+        include: { all: true },
+      });
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
   async hashPassword(password: string): Promise<string> {
     try {
       return bcrypt.hash(password, 10);
-    } catch (e) {
-      throw new Error(e);
+    } catch (err) {
+      throw new Error(err);
     }
   }
 }
