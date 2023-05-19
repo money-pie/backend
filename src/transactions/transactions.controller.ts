@@ -8,6 +8,8 @@ import {
   Delete,
   Req,
   UseGuards,
+  ParseBoolPipe,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
@@ -30,5 +32,17 @@ export class TransactionsController {
   findOne(@Req() req, @Param("id") id: string) {
     const user = req.user;
     return this.transactionsService.findOneById(user, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("/:personal/:page/:limit")
+  findAll(
+    @Req() req,
+    @Param("personal", ParseBoolPipe) personal: boolean,
+    @Param("page", ParseIntPipe) page: number,
+    @Param("limit", ParseIntPipe) limit: number,
+  ) {
+    const user = req.user;
+    return this.transactionsService.findAll(user, personal, page, limit);
   }
 }

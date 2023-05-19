@@ -34,9 +34,9 @@ export class TransactionsService {
 
   async findOneById(user: User, id: string) {
     try {
-      const usr = await this.userService.findOne(user);
-      const userId = usr.id;
-      const groupId = usr.id;
+      const usr: User = await this.userService.findOne(user);
+      const userId: string = usr.id;
+      const groupId: string = usr.id;
       return this.transactionRepository.findOne({
         where: { id, [Op.or]: [{ userId }, { groupId }] },
         include: { all: true },
@@ -46,8 +46,27 @@ export class TransactionsService {
     }
   }
 
-  findAll() {
-    return `This action returns all transactions`;
+  async findAll(user: User, personal: boolean, page: number, limit: number) {
+    const offset: number = (page - 1) * limit;
+    const usr: User = await this.userService.findOne(user);
+    const userId: string = usr.id;
+    const groupId: string = usr.id;
+
+    if (personal) {
+      return this.transactionRepository.findAll({
+        where: { personal, userId },
+        offset,
+        limit,
+        order: [["date", "DESC"]],
+      });
+    }
+
+    return this.transactionRepository.findAll({
+      where: { personal, groupId },
+      offset,
+      limit,
+      order: [["date", "DESC"]],
+    });
   }
 
   update(id: number, updateTransactionDto: UpdateTransactionDto) {

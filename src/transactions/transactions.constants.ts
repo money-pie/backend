@@ -1,5 +1,7 @@
 export enum Category {
   PRODUCTS = "Продукты",
+  ENTERTAINMENT = "Развлечения",
+  TRANSPORT = "Транспорт",
   HEALTH = "Здоровье",
   HOME = "ЖКХ",
   EDUCATION = "Обучение",
