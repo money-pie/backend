@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
+import { Op } from "sequelize";
 import { User } from "src/users/models/user.model";
 import { UsersService } from "src/users/users.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
@@ -13,7 +14,7 @@ export class TransactionsService {
     private readonly userService: UsersService,
   ) {}
 
-  async create(createTransactionDto, user) {
+  async create(user: User, createTransactionDto: CreateTransactionDto) {
     try {
       const { id, groupId } = await this.userService.findOne(user);
       const transaction = {
@@ -31,9 +32,15 @@ export class TransactionsService {
     }
   }
 
-  async findOneById(id: string) {
+  async findOneById(user: User, id: string) {
     try {
-      return this.transactionRepository.findByPk(id);
+      const usr = await this.userService.findOne(user);
+      const userId = usr.id;
+      const groupId = usr.id;
+      return this.transactionRepository.findOne({
+        where: { id, [Op.or]: [{ userId }, { groupId }] },
+        include: { all: true },
+      });
     } catch (err) {
       throw new Error(err);
     }

@@ -20,14 +20,15 @@ export class TransactionsController {
 
   @UseGuards(JwtAuthGuard)
   @Post("/add")
-  create(@Body() createTransactionDto: CreateTransactionDto, @Req() req) {
+  create(@Req() req, @Body() createTransactionDto: CreateTransactionDto) {
     const user = req.user;
-    return this.transactionsService.create(createTransactionDto, user);
+    return this.transactionsService.create(user, createTransactionDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("/:id")
-  findOne(@Param("id") id: string) {
-    return this.transactionsService.findOneById(id);
+  findOne(@Req() req, @Param("id") id: string) {
+    const user = req.user;
+    return this.transactionsService.findOneById(user, id);
   }
 }
