@@ -10,11 +10,13 @@ import {
   UseGuards,
   ParseBoolPipe,
   ParseIntPipe,
+  ParseEnumPipe,
 } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { UpdateTransactionDto } from "./dto/update-transaction.dto";
-import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
+import { JwtAuthGuard } from "../auth/guards/jwt.guard";
+import { Category, Month } from "./transactions.constants";
 
 @Controller("transactions")
 export class TransactionsController {
@@ -35,14 +37,51 @@ export class TransactionsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("/:personal/:page/:limit")
-  findAll(
+  @Get("/all/:personal")
+  findAll(@Req() req, @Param("personal", ParseBoolPipe) personal: boolean) {
+    const user = req.user;
+    return this.transactionsService.findAll(user, personal);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("/all/:personal/:page/:limit")
+  findAllPagination(
     @Req() req,
     @Param("personal", ParseBoolPipe) personal: boolean,
     @Param("page", ParseIntPipe) page: number,
     @Param("limit", ParseIntPipe) limit: number,
   ) {
     const user = req.user;
-    return this.transactionsService.findAll(user, personal, page, limit);
+    return this.transactionsService.findAllPagination(
+      user,
+      personal,
+      page,
+      limit,
+    );
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("/all/:personal/:page/:limit/:category/:month/:year")
+  findAllFiltered(
+    @Req() req,
+    @Param("personal", ParseBoolPipe) personal: boolean,
+    @Param("page", ParseIntPipe) page: number,
+    @Param("limit", ParseIntPipe) limit: number,
+    @Param("category", new ParseEnumPipe(Category)) category: Category,
+    @Param("month", new ParseEnumPipe(Month)) month: Month,
+    @Param("year", ParseIntPipe) year: number,
+  ) {
+    const user = req.user;
+    return this.transactionsService.findAllFiltered(
+      user,
+      personal,
+      page,
+      limit,
+      category,
+      month,
+      year,
+    );
+  }
+
+  //TODO получение информации за определенный месяц вида: {Категория, количество трат в категории, сумма трат}
 }

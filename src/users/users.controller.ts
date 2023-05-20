@@ -21,4 +21,5 @@ export class UsersController {
   }
 
   //TODO смена логина
+  //TODO цель на месяц установить
 }

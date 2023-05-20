@@ -9,11 +9,12 @@ import {
 } from "sequelize-typescript";
 import Group from "../../groups/models/group.model";
 import { User } from "../../users/models/user.model";
-import { Category } from "../transactions.constants";
+import { Category, Kind } from "../transactions.constants";
 
 interface TransactionCreationAttrs {
   sum: number;
-  category: string;
+  category: Category;
+  kind: Kind;
   date: Date;
   time: Date;
   personal: boolean;
@@ -33,7 +34,7 @@ export class Transaction extends Model<Transaction, TransactionCreationAttrs> {
   })
   id: string;
 
-  @Column({})
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
   sum: number;
 
   @Column({
@@ -42,7 +43,16 @@ export class Transaction extends Model<Transaction, TransactionCreationAttrs> {
   })
   category: Category;
 
-  @Column({ type: DataType.DATE, allowNull: false, defaultValue: DataType.NOW })
+  @Column({
+    type: DataType.ENUM({ values: Object.values(Kind) }),
+    allowNull: false,
+  })
+  kind: Kind;
+
+  @Column({
+    type: DataType.DATEONLY,
+    allowNull: false,
+  })
   date: Date;
 
   @Column({ type: DataType.TIME })
