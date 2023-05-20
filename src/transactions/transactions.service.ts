@@ -1,12 +1,9 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
-// import sequelize from 'sequelize';
 import { Op, QueryTypes } from "sequelize";
-// import sequelize from 'sequelize/types/sequelize';
 import { User } from "../users/models/user.model";
 import { UsersService } from "../users/users.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
-import { UpdateTransactionDto } from "./dto/update-transaction.dto";
 import { Transaction } from "./models/transaction.model";
 import {
   Category,
@@ -234,12 +231,12 @@ export class TransactionsService {
     return { sum, transactionsInfo };
   }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
-  }
+  async remove(user: User, id: string) {
+    const usr: User = await this.userService.findOne(user);
+    const userId: string = usr.id;
+    const groupId: string = usr.id;
 
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
+    return this.transactionRepository.destroy({ where: { id, userId } });
   }
 
   private getDaysInMonth(year: number, month: Month): number {

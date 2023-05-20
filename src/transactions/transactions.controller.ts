@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Req,
@@ -11,10 +10,10 @@ import {
   ParseBoolPipe,
   ParseIntPipe,
   ParseEnumPipe,
+  ParseUUIDPipe,
 } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
-import { UpdateTransactionDto } from "./dto/update-transaction.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 import { Category, Kind, Month } from "./transactions.constants";
 
@@ -31,7 +30,7 @@ export class TransactionsController {
 
   @UseGuards(JwtAuthGuard)
   @Get("/:id")
-  findOne(@Req() req, @Param("id") id: string) {
+  findOne(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
     const user = req.user;
     return this.transactionsService.findOneById(user, id);
   }
@@ -44,7 +43,7 @@ export class TransactionsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("/all/:personal/:page/:limit")
+  @Get("/all-pag/:personal/:page/:limit")
   findAllPagination(
     @Req() req,
     @Param("personal", ParseBoolPipe) personal: boolean,
@@ -94,5 +93,12 @@ export class TransactionsController {
   ) {
     const user = req.user;
     return this.transactionsService.findInfo(user, personal, kind, month, year);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete("/:id")
+  deleteCosts(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
+    const user = req.user;
+    return this.transactionsService.remove(user, id);
   }
 }
