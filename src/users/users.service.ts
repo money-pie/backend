@@ -13,7 +13,7 @@ export class UsersService {
     return user;
   }
 
-  async findOne(user) {
+  async findOne(user: User): Promise<User> {
     try {
       return this.userRepository.findByPk(user.id, {
         attributes: {
@@ -25,7 +25,7 @@ export class UsersService {
     }
   }
 
-  async setNotifications(user): Promise<any> {
+  async setNotifications(user: User): Promise<any> {
     try {
       const { notification } = await this.findOne(user);
       const turnedNotification = false;

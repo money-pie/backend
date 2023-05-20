@@ -19,4 +19,7 @@ export class UsersController {
     const user = req.user;
     return this.usersService.setNotifications(user);
   }
+
+  //TODO смена логина
+  //TODO цель на месяц установить
 }
