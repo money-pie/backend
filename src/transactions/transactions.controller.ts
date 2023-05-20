@@ -16,7 +16,7 @@ import { TransactionsService } from "./transactions.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { UpdateTransactionDto } from "./dto/update-transaction.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
-import { Category, Month } from "./transactions.constants";
+import { Category, Kind, Month } from "./transactions.constants";
 
 @Controller("transactions")
 export class TransactionsController {
@@ -61,7 +61,7 @@ export class TransactionsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("/all/:personal/:page/:limit/:category/:month/:year")
+  @Get("/sort/:personal/:page/:limit/:category/:month/:year")
   findAllFiltered(
     @Req() req,
     @Param("personal", ParseBoolPipe) personal: boolean,
@@ -83,5 +83,16 @@ export class TransactionsController {
     );
   }
 
-  //TODO получение информации за определенный месяц вида: {Категория, количество трат в категории, сумма трат}
+  @UseGuards(JwtAuthGuard)
+  @Get("/categories-info/:personal/:kind/:month/:year")
+  findInfo(
+    @Req() req,
+    @Param("personal", ParseBoolPipe) personal: boolean,
+    @Param("kind", new ParseEnumPipe(Kind)) kind: Kind,
+    @Param("month", new ParseEnumPipe(Month)) month: Month,
+    @Param("year", ParseIntPipe) year: number,
+  ) {
+    const user = req.user;
+    return this.transactionsService.findInfo(user, personal, kind, month, year);
+  }
 }

@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
-import { Op } from "sequelize";
+// import sequelize from 'sequelize';
+import { Op, QueryTypes } from "sequelize";
+// import sequelize from 'sequelize/types/sequelize';
 import { User } from "../users/models/user.model";
 import { UsersService } from "../users/users.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
@@ -10,6 +12,7 @@ import {
   Category,
   Month,
   EXCESSING_CATEGORIES,
+  Kind,
 } from "./transactions.constants";
 
 @Injectable()
@@ -20,7 +23,6 @@ export class TransactionsService {
   ) {}
 
   async create(user: User, createTransactionDto: CreateTransactionDto) {
-    //TODO написать проверку на премиум пользователя, если не премиум то проверить сколько категория у него есть, если пытается добавить шестую, выбросить ошибку
     const { id, groupId, subId } = await this.userService.findOne(user);
     const transaction = {
       sum: createTransactionDto.sum,
@@ -65,16 +67,15 @@ export class TransactionsService {
   }
 
   async findOneById(user: User, id: string) {
-    try {
-      const usr: User = await this.userService.findOne(user);
-      const userId: string = usr.id;
-      const groupId: string = usr.id;
-      return this.transactionRepository.findOne({
-        where: { id, [Op.or]: [{ userId }, { groupId }] },
-      });
-    } catch (err) {
-      throw new Error(err);
-    }
+    const usr: User = await this.userService.findOne(user);
+    const userId: string = usr.id;
+    const groupId: string = usr.id;
+
+    const transaction = await this.transactionRepository.findOne({
+      where: { id, [Op.or]: [{ userId }, { groupId }] },
+    });
+
+    return transaction;
   }
 
   async findAll(user: User, personal: boolean) {
@@ -151,7 +152,7 @@ export class TransactionsService {
       category,
     };
 
-    const sum = await this.transactionRepository.sum("sum", {
+    let sum: number = await this.transactionRepository.sum("sum", {
       where: whereQuery,
     });
     const transactions = await this.transactionRepository.findAll({
@@ -161,7 +162,76 @@ export class TransactionsService {
       order: [["date", "DESC"]],
     });
 
+    if (sum === null) {
+      sum = 0;
+    }
+
     return { sum, transactions };
+  }
+
+  async findInfo(
+    user: User,
+    personal: boolean,
+    kind: Kind,
+    month: Month,
+    year: number,
+  ) {
+    const usr: User = await this.userService.findOne(user);
+    const userId: string = usr.id;
+    const groupId: string = usr.id;
+
+    const whereQuery = {
+      personal,
+      kind,
+      [personal ? "userId" : "groupId"]: personal ? userId : groupId,
+      date: {
+        [Op.and]: [
+          { [Op.gte]: `${year}-${month}-01` },
+          {
+            [Op.lte]: `${year}-${month}-${this.getDaysInMonth(year, month)}`,
+          },
+        ],
+      },
+    };
+
+    const transactionsInfo = await this.transactionRepository.sequelize.query(
+      `
+    SELECT
+      category,
+      COUNT(*) AS count,
+      SUM(sum) AS sum
+    FROM
+      transaction
+    WHERE
+      personal = :personal AND
+      kind = :kind AND
+      ${personal ? "user_id" : "group_id"} = :id AND
+      date >= :start AND
+      date <= :end
+    GROUP BY
+      category
+  `,
+      {
+        replacements: {
+          personal: whereQuery.personal,
+          kind: whereQuery.kind,
+          id: personal ? userId : groupId,
+          start: `${year}-${month}-01`,
+          end: `${year}-${month}-${this.getDaysInMonth(year, month)}`,
+        },
+        type: QueryTypes.SELECT,
+      },
+    );
+
+    let sum: number = await this.transactionRepository.sum("sum", {
+      where: whereQuery,
+    });
+
+    if (sum === null) {
+      sum = 0;
+    }
+
+    return { sum, transactionsInfo };
   }
 
   update(id: number, updateTransactionDto: UpdateTransactionDto) {
