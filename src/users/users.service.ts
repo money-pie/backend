@@ -43,11 +43,19 @@ export class UsersService {
     }
   }
 
+  async updateGroup(groupId: string, id: string): Promise<any> {
+    const data = {
+      groupId: groupId,
+    };
+    this.userRepository.update(data, {
+      where: { id: id },
+    });
+  }
+
   async getUserByEmail(email: string) {
     try {
       return this.userRepository.findOne({
         where: { email },
-        include: { all: true },
       });
     } catch (err) {
       throw new Error(err);

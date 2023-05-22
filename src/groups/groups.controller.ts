@@ -6,37 +6,45 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
+  ParseUUIDPipe,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { GroupsService } from "./groups.service";
 import { CreateGroupDto } from "./dto/create-group.dto";
 import { UpdateGroupDto } from "./dto/update-group.dto";
+import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 
 @Controller("groups")
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
-  @Post()
-  create(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupsService.create(createGroupDto);
+  @UseGuards(JwtAuthGuard)
+  @Post("/invite")
+  create(@Req() req, @Body() createGroupDto: CreateGroupDto) {
+    const user = req.user;
+    return this.groupsService.create(user, createGroupDto);
   }
 
-  @Get()
-  findAll() {
-    return this.groupsService.findAll();
+  @UseGuards(JwtAuthGuard)
+  @Patch("/exit")
+  exit(@Req() req) {
+    const user = req.user;
+    return this.groupsService.exit(user);
   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.groupsService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  @Patch("/aim/:sum")
+  setAim(@Req() req, @Param("sum", ParseIntPipe) aim: number) {
+    const user = req.user;
+    return this.groupsService.setAim(user, aim);
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateGroupDto: UpdateGroupDto) {
-    return this.groupsService.update(+id, updateGroupDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.groupsService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  @Get("/find/:id")
+  findOne(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
+    const user = req.user;
+    return this.groupsService.findOne(id);
   }
 }
