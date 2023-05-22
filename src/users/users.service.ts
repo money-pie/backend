@@ -52,6 +52,15 @@ export class UsersService {
     });
   }
 
+  async updateSub(sub: string, id: string): Promise<any> {
+    this.userRepository.update(
+      { subId: sub },
+      {
+        where: { id: id },
+      },
+    );
+  }
+
   async getUserByEmail(email: string) {
     try {
       return this.userRepository.findOne({
