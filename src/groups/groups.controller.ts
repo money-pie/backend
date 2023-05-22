@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   ParseUUIDPipe,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { GroupsService } from "./groups.service";
 import { CreateGroupDto } from "./dto/create-group.dto";
@@ -31,6 +32,13 @@ export class GroupsController {
   exit(@Req() req) {
     const user = req.user;
     return this.groupsService.exit(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch("/aim/:sum")
+  setAim(@Req() req, @Param("sum", ParseIntPipe) aim: number) {
+    const user = req.user;
+    return this.groupsService.setAim(user, aim);
   }
 
   @UseGuards(JwtAuthGuard)

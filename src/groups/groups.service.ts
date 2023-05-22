@@ -109,4 +109,11 @@ export class GroupsService {
       include: ["users"],
     });
   }
+
+  async setAim(user: User, aim: number) {
+    const usr: User = await this.userService.findOne(user);
+    const id: string = usr.groupId;
+
+    return this.groupRepository.update({ aim: aim }, { where: { id } });
+  }
 }
