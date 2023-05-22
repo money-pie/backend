@@ -44,7 +44,7 @@ export class User extends Model<User, UserCreationAttrs> {
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: true })
   notification: boolean;
 
-  @Column({ type: DataType.INTEGER, defaultValue: null })
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
   aim: number;
 
   @ForeignKey(() => Subscription)
