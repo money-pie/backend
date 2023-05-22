@@ -48,11 +48,21 @@ export class User extends Model<User, UserCreationAttrs> {
   aim: number;
 
   @ForeignKey(() => Subscription)
-  @Column({ type: DataType.UUID, unique: true })
+  @Column({
+    type: DataType.UUID,
+    unique: true,
+    onDelete: "SET NULL",
+    onUpdate: "CASCADE",
+  })
   subId: string;
 
   @ForeignKey(() => Group)
-  @Column({ type: DataType.UUID, defaultValue: null })
+  @Column({
+    type: DataType.UUID,
+    defaultValue: null,
+    onDelete: "SET NULL",
+    onUpdate: "CASCADE",
+  })
   groupId: string;
 
   @BelongsTo(() => Group)

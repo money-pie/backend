@@ -6,40 +6,27 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from "@nestjs/common";
 import { SubscriptionsService } from "./subscriptions.service";
-import { CreateSubscriptionDto } from "./dto/create-subscription.dto";
-import { UpdateSubscriptionDto } from "./dto/update-subscription.dto";
+import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
 
 @Controller("subscriptions")
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
-  @Post()
-  create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
-    return this.subscriptionsService.create(createSubscriptionDto);
+  @UseGuards(JwtAuthGuard)
+  @Post("/subscribe")
+  create(@Req() req) {
+    const user = req.user;
+    return this.subscriptionsService.create(user);
   }
 
-  @Get()
-  findAll() {
-    return this.subscriptionsService.findAll();
-  }
-
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.subscriptionsService.findOne(+id);
-  }
-
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
-  ) {
-    return this.subscriptionsService.update(+id, updateSubscriptionDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.subscriptionsService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  @Delete("/unsub")
+  remove(@Req() req) {
+    const user = req.user;
+    return this.subscriptionsService.unsub(user);
   }
 }
