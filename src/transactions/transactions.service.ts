@@ -234,7 +234,6 @@ export class TransactionsService {
   async remove(user: User, id: string) {
     const usr: User = await this.userService.findOne(user);
     const userId: string = usr.id;
-    const groupId: string = usr.id;
 
     return this.transactionRepository.destroy({ where: { id, userId } });
   }
