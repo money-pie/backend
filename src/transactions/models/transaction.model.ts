@@ -65,11 +65,21 @@ export class Transaction extends Model<Transaction, TransactionCreationAttrs> {
   description: string;
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, defaultValue: null })
+  @Column({
+    type: DataType.UUID,
+    defaultValue: null,
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   userId: string;
 
   @ForeignKey(() => Group)
-  @Column({ type: DataType.UUID, defaultValue: null })
+  @Column({
+    type: DataType.UUID,
+    defaultValue: null,
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   groupId: string;
 
   @BelongsTo(() => User)

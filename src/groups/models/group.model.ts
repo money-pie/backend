@@ -36,17 +36,9 @@ export default class Group extends Model<Group, GroupCreationAttrs> {
   @Column({ type: DataType.INTEGER, allowNull: false, defaultValue: 1 })
   curCapacity: number;
 
-  @HasMany(() => User, {
-    foreignKey: "groupId",
-    onDelete: "SET NULL",
-    onUpdate: "CASCADE",
-  })
+  @HasMany(() => User)
   users: User[];
 
-  @HasMany(() => Transaction, {
-    foreignKey: "groupId",
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  })
+  @HasMany(() => Transaction)
   transactions: Transaction[];
 }
