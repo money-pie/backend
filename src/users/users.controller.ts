@@ -1,4 +1,13 @@
-import { Controller, Get, Body, Patch, UseGuards, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  UseGuards,
+  Req,
+  ParseIntPipe,
+  Param,
+} from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 
@@ -20,6 +29,10 @@ export class UsersController {
     return this.usersService.setNotifications(user);
   }
 
-  //TODO смена логина
-  //TODO цель на месяц установить
+  @UseGuards(JwtAuthGuard)
+  @Patch("/aim/:sum")
+  setAim(@Req() req, @Param("sum", ParseIntPipe) aim: number) {
+    const user = req.user;
+    return this.usersService.setAim(user, aim);
+  }
 }

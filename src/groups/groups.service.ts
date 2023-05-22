@@ -3,7 +3,6 @@ import { InjectModel } from "@nestjs/sequelize";
 import { User } from "../users/models/user.model";
 import { UsersService } from "../users/users.service";
 import { CreateGroupDto } from "./dto/create-group.dto";
-import { UpdateGroupDto } from "./dto/update-group.dto";
 import {
   USER_ALREADY_IN_GROUP,
   USER_NOT_FOUND_ERROR,

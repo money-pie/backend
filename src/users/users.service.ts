@@ -69,4 +69,9 @@ export class UsersService {
       throw new Error(err);
     }
   }
+
+  async setAim(user: User, aim: number) {
+    const usr: User = await this.findOne(user);
+    return this.userRepository.update({ aim: aim }, { where: { id: usr.id } });
+  }
 }

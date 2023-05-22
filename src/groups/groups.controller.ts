@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   Req,
   ParseUUIDPipe,
@@ -13,7 +12,6 @@ import {
 } from "@nestjs/common";
 import { GroupsService } from "./groups.service";
 import { CreateGroupDto } from "./dto/create-group.dto";
-import { UpdateGroupDto } from "./dto/update-group.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 
 @Controller("groups")
