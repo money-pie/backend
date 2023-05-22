@@ -27,18 +27,26 @@ export default class Group extends Model<Group, GroupCreationAttrs> {
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
   premium: boolean;
 
-  @Column({ type: DataType.INTEGER, defaultValue: null })
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
   aim: number;
 
   @Column({ type: DataType.INTEGER, allowNull: false, defaultValue: 2 })
   maxCapacity: number;
 
-  @Column({ type: DataType.INTEGER, allowNull: false, defaultValue: 2 })
+  @Column({ type: DataType.INTEGER, allowNull: false, defaultValue: 1 })
   curCapacity: number;
 
-  @HasMany(() => User)
+  @HasMany(() => User, {
+    foreignKey: "groupId",
+    onDelete: "SET NULL",
+    onUpdate: "CASCADE",
+  })
   users: User[];
 
-  @HasMany(() => Transaction)
+  @HasMany(() => Transaction, {
+    foreignKey: "groupId",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   transactions: Transaction[];
 }
