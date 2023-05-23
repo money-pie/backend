@@ -9,8 +9,8 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle("MoneyPie API")
-    .setDescription("MoneyPie app API documentation")
-    .setVersion("1.0")
+    .setDescription("MoneyPie app REST API documentation")
+    .setVersion("0.1")
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

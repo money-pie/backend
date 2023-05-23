@@ -13,11 +13,14 @@ import {
 import { GroupsService } from "./groups.service";
 import { CreateGroupDto } from "./dto/create-group.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Group endpoints")
 @Controller("groups")
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
+  @ApiOperation({ summary: "Invite user to group" })
   @UseGuards(JwtAuthGuard)
   @Post("/invite")
   create(@Req() req, @Body() createGroupDto: CreateGroupDto) {
@@ -25,6 +28,7 @@ export class GroupsController {
     return this.groupsService.create(user, createGroupDto);
   }
 
+  @ApiOperation({ summary: "Leave a group" })
   @UseGuards(JwtAuthGuard)
   @Patch("/exit")
   exit(@Req() req) {
@@ -32,6 +36,7 @@ export class GroupsController {
     return this.groupsService.exit(user);
   }
 
+  @ApiOperation({ summary: "Set aim for group`s budget" })
   @UseGuards(JwtAuthGuard)
   @Patch("/aim/:sum")
   setAim(@Req() req, @Param("sum", ParseIntPipe) aim: number) {
@@ -39,6 +44,7 @@ export class GroupsController {
     return this.groupsService.setAim(user, aim);
   }
 
+  @ApiOperation({ summary: "Find group by id" })
   @UseGuards(JwtAuthGuard)
   @Get("/find/:id")
   findOne(@Req() req, @Param("id", ParseUUIDPipe) id: string) {

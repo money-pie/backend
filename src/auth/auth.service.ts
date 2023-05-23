@@ -6,6 +6,7 @@ import * as bcrypt from "bcryptjs";
 import { USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from "./auth.constants";
 import { BadRequestException } from "@nestjs/common/exceptions/bad-request.exception";
 import { TokenService } from "../token/token.service";
+import { LoginDto } from "./dto/auth.dto";
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async login(userDto: CreateUserDto) {
+  async login(userDto: LoginDto) {
     const user = await this.validateUser(userDto);
     return this.tokenService.generateUsrToken({
       id: user.id,
@@ -42,7 +43,7 @@ export class AuthService {
     });
   }
 
-  private async validateUser(userDto: CreateUserDto) {
+  private async validateUser(userDto: LoginDto) {
     const user = await this.userService.getUserByEmail(userDto.email);
 
     if (!user) {

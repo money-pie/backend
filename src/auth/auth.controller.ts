@@ -1,20 +1,31 @@
-import { Body, Controller, Post } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Post, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException } from "@nestjs/common/exceptions";
+import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { CreateUserDto } from "../users/dto/create-user.dto";
 import { AuthService } from "./auth.service";
-import { AuthDto } from "./dto/auth.dto";
+import { LoginDto } from "./dto/auth.dto";
+import { AuthUserResponse } from "./response/auth.responses";
 
-@ApiTags("Authorization")
+@ApiTags("Log in and sign up endpoints")
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiOperation({ summary: "User authorization" })
+  @ApiResponse({ status: 201, type: AuthUserResponse })
   @Post("/login")
-  login(@Body() userDto: AuthDto) {
+  login(
+    @Body() userDto: LoginDto,
+  ): Promise<AuthUserResponse | UnauthorizedException> {
     return this.authService.login(userDto);
   }
 
+  @ApiOperation({ summary: "User registration" })
+  @ApiResponse({ status: 201, type: AuthUserResponse })
   @Post("/registration")
-  registration(@Body() userDto: AuthDto) {
+  registration(
+    @Body() userDto: CreateUserDto,
+  ): Promise<AuthUserResponse | UnauthorizedException | BadRequestException> {
     return this.authService.registration(userDto);
   }
 }

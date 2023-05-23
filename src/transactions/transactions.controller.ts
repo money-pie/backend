@@ -16,11 +16,14 @@ import { TransactionsService } from "./transactions.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 import { Category, Kind, Month } from "./transactions.constants";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Transactions endpoints")
 @Controller("transactions")
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
+  @ApiOperation({ summary: "Add a transaction" })
   @UseGuards(JwtAuthGuard)
   @Post("/add")
   create(@Req() req, @Body() createTransactionDto: CreateTransactionDto) {
@@ -28,6 +31,7 @@ export class TransactionsController {
     return this.transactionsService.create(user, createTransactionDto);
   }
 
+  @ApiOperation({ summary: "Get transaction by id" })
   @UseGuards(JwtAuthGuard)
   @Get("/:id")
   findOne(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
@@ -35,6 +39,7 @@ export class TransactionsController {
     return this.transactionsService.findOneById(user, id);
   }
 
+  @ApiOperation({ summary: "Get list of transactions" })
   @UseGuards(JwtAuthGuard)
   @Get("/all/:personal")
   findAll(@Req() req, @Param("personal", ParseBoolPipe) personal: boolean) {
@@ -42,6 +47,7 @@ export class TransactionsController {
     return this.transactionsService.findAll(user, personal);
   }
 
+  @ApiOperation({ summary: "Get list of transactions with pagination" })
   @UseGuards(JwtAuthGuard)
   @Get("/all-pag/:personal/:page/:limit")
   findAllPagination(
@@ -59,6 +65,9 @@ export class TransactionsController {
     );
   }
 
+  @ApiOperation({
+    summary: "Get filtered list of transactions with pagination",
+  })
   @UseGuards(JwtAuthGuard)
   @Get("/sort/:personal/:page/:limit/:category/:month/:year")
   findAllFiltered(
@@ -82,6 +91,7 @@ export class TransactionsController {
     );
   }
 
+  @ApiOperation({ summary: "Get info about transactions with filters" })
   @UseGuards(JwtAuthGuard)
   @Get("/categories-info/:personal/:kind/:month/:year")
   findInfo(
@@ -95,6 +105,7 @@ export class TransactionsController {
     return this.transactionsService.findInfo(user, personal, kind, month, year);
   }
 
+  @ApiOperation({ summary: "Delete transaction" })
   @UseGuards(JwtAuthGuard)
   @Delete("/:id")
   deleteCosts(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
