@@ -14,6 +14,7 @@ import Group from "./groups/models/group.model";
 import { HintUsers } from "./hints/models/hintUsers.model";
 import { AuthModule } from "./auth/auth.module";
 import { TokenModule } from "./token/token.module";
+import { DemoModule } from "./demo/demo.module";
 import config from "./configs/config";
 
 @Module({
@@ -45,6 +46,7 @@ import config from "./configs/config";
     TransactionsModule,
     AuthModule,
     TokenModule,
+    DemoModule,
   ],
 })
 export class AppModule {}
