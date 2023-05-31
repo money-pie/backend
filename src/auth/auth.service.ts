@@ -7,16 +7,26 @@ import { USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from "./auth.constants";
 import { BadRequestException } from "@nestjs/common/exceptions/bad-request.exception";
 import { TokenService } from "../token/token.service";
 import { LoginDto } from "./dto/auth.dto";
+import { HintsService } from "../hints/hints.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
     private readonly tokenService: TokenService,
+    private readonly hintsService: HintsService,
   ) {}
 
   async login(userDto: LoginDto) {
     const user = await this.validateUser(userDto);
+
+    const randomNumber = Math.random();
+    const hintProbability = 0.3;
+
+    if (randomNumber < hintProbability) {
+      this.hintsService.createHintForUser(user.id);
+    }
+
     return this.tokenService.generateUsrToken({
       id: user.id,
       email: user.email,
@@ -36,6 +46,9 @@ export class AuthService {
       ...userDto,
       password: hashPassword,
     });
+
+    this.hintsService.createHintForUser(user.id);
+
     return this.tokenService.generateUsrToken({
       id: user.id,
       email: user.email,

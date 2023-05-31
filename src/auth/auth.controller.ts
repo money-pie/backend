@@ -1,6 +1,6 @@
 import { Body, Controller, Post, UnauthorizedException } from "@nestjs/common";
 import { BadRequestException } from "@nestjs/common/exceptions";
-import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateUserDto } from "../users/dto/create-user.dto";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/auth.dto";
