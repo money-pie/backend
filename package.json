@@ -21,7 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "lint-staged": {
-    "*.(ts|tsx|js|jsx)": [
+    "*.(ts|tsx|jsx)": [
       "npm run lint",
       "git add"
     ]

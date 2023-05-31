@@ -16,5 +16,5 @@ export class HintUsers extends Model<HintUsers> {
 
   @ForeignKey(() => User)
   @Column({ type: DataType.UUID })
-  userId: number;
+  userId: string;
 }

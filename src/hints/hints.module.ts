@@ -5,10 +5,12 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { Hint } from "./models/hint.models";
 import { User } from "../users/models/user.model";
 import { HintUsers } from "./models/hintUsers.model";
+import { UsersModule } from "../users/users.module";
 
 @Module({
   controllers: [HintsController],
   providers: [HintsService],
-  imports: [SequelizeModule.forFeature([Hint, User, HintUsers])],
+  exports: [HintsService],
+  imports: [SequelizeModule.forFeature([Hint, User, HintUsers]), UsersModule],
 })
 export class HintsModule {}
