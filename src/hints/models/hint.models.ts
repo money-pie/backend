@@ -16,16 +16,16 @@ interface HintCreationAttrs {
   text: string;
 }
 
-@Table({ tableName: "hint", underscored: true })
+@Table({ tableName: "hint", underscored: true, timestamps: false })
 export class Hint extends Model<Hint, HintCreationAttrs> {
   @PrimaryKey
   @Column({
-    type: DataType.UUID,
+    type: DataType.INTEGER,
     allowNull: false,
     unique: true,
-    defaultValue: DataType.UUIDV4,
+    autoIncrement: true,
   })
-  id: string;
+  id: number;
 
   @Column({
     type: DataType.ENUM({ values: Object.values(Theme) }),
