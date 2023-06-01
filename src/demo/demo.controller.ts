@@ -6,7 +6,6 @@ import {
   ParseEnumPipe,
   ParseIntPipe,
   ParseUUIDPipe,
-  Req,
 } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Category, Kind, Month } from "src/transactions/transactions.constants";

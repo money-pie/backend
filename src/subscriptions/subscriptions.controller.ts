@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Post, Delete, Req, UseGuards } from "@nestjs/common";
 import { SubscriptionsService } from "./subscriptions.service";
 import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";

@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Delete, UseGuards, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  ParseIntPipe,
+} from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
 import { HintsService } from "./hints.service";
@@ -19,7 +27,7 @@ export class HintsController {
   @ApiOperation({ summary: "Delete hint with id" })
   @UseGuards(JwtAuthGuard)
   @Delete("/:hintId")
-  removeHintForUser(@Req() req, @Param("hintId") hintId: number) {
+  removeHintForUser(@Req() req, @Param("hintId", ParseIntPipe) hintId: number) {
     const user = req.user;
     return this.hintsService.removeHintForUser(user, hintId);
   }
