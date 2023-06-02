@@ -214,7 +214,11 @@ const arrOfTransactions: MockTransaction[] = [
   },
 ];
 
+const sortedTransactions = arrOfTransactions.sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+);
+
 export const mapOfTransactions = new Map();
-arrOfTransactions.forEach((transaction) =>
+sortedTransactions.forEach((transaction) =>
   mapOfTransactions.set(transaction.id, transaction),
 );

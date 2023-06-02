@@ -15,14 +15,8 @@ import { HintUsers } from "../../hints/models/hintUsers.model";
 import { Subscription } from "../../subscriptions/models/subscription.model";
 import { Transaction } from "../../transactions/models/transaction.model";
 
-interface UserCreationAttrs {
-  email: string;
-  login: string;
-  password: string;
-}
-
 @Table({ tableName: "user", underscored: true })
-export class User extends Model<User, UserCreationAttrs> {
+export class User extends Model<User> {
   @PrimaryKey
   @Column({
     type: DataType.UUID,

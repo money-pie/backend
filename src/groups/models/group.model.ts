@@ -9,12 +9,8 @@ import {
 import { Transaction } from "../../transactions/models/transaction.model";
 import { User } from "../../users/models/user.model";
 
-interface GroupCreationAttrs {
-  premium: boolean;
-}
-
-@Table({ tableName: "group", underscored: true })
-export default class Group extends Model<Group, GroupCreationAttrs> {
+@Table({ tableName: "group", underscored: true, timestamps: false })
+export default class Group extends Model<Group> {
   @PrimaryKey
   @Column({
     type: DataType.UUID,

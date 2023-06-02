@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Op, QueryTypes } from "sequelize";
 import { User } from "../users/models/user.model";
@@ -10,6 +15,10 @@ import {
   Month,
   EXCESSING_CATEGORIES,
   Kind,
+  CREATE_TRANSACTION_ERROR,
+  FIND_TRANSACTION_ERROR,
+  FIND_TRANSACTIONS_ERROR,
+  FIND_INFO_ERROR,
 } from "./transactions.constants";
 
 @Injectable()
@@ -32,27 +41,42 @@ export class TransactionsService {
       groupId: createTransactionDto.personal ? null : groupId,
     };
 
-    if (subId) {
-      return this.transactionRepository.create(transaction);
+    try {
+      if (subId) {
+        return this.transactionRepository.create(transaction);
+      }
+    } catch (err) {
+      throw new HttpException(
+        CREATE_TRANSACTION_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
-    const uniqueCategories: Category[] = await this.transactionRepository
-      .findAll({
-        attributes: [
-          [
-            this.transactionRepository.sequelize.fn(
-              "DISTINCT",
-              this.transactionRepository.sequelize.col("category"),
-            ),
-            "category",
-          ],
-        ],
-      })
-      .then((categories) => {
-        return categories.map((category) => category.category);
-      });
+    let uniqueCategories: Category[];
 
-    console.log(uniqueCategories);
+    try {
+      uniqueCategories = await this.transactionRepository
+        .findAll({
+          attributes: [
+            [
+              this.transactionRepository.sequelize.fn(
+                "DISTINCT",
+                this.transactionRepository.sequelize.col("category"),
+              ),
+              "category",
+            ],
+          ],
+        })
+        .then((categories) => {
+          return categories.map((category) => category.category);
+        });
+    } catch (err) {
+      throw new HttpException(
+        CREATE_TRANSACTION_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
     if (
       uniqueCategories.length >= 5 &&
       !uniqueCategories.includes(createTransactionDto.category)
@@ -60,7 +84,14 @@ export class TransactionsService {
       throw new BadRequestException(EXCESSING_CATEGORIES);
     }
 
-    return this.transactionRepository.create(transaction);
+    try {
+      return this.transactionRepository.create(transaction);
+    } catch (err) {
+      throw new HttpException(
+        CREATE_TRANSACTION_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async findOneById(user: User, id: string) {
@@ -68,16 +99,20 @@ export class TransactionsService {
     const userId: string = usr.id;
     const groupId: string = usr.id;
 
-    const transaction = await this.transactionRepository.findOne({
-      where: { id, [Op.or]: [{ userId }, { groupId }] },
-    });
+    try {
+      const transaction = await this.transactionRepository.findOne({
+        where: { id, [Op.or]: [{ userId }, { groupId }] },
+      });
 
-    return transaction;
+      return transaction;
+    } catch (err) {
+      throw new HttpException(FIND_TRANSACTION_ERROR, HttpStatus.NOT_FOUND);
+    }
   }
 
   async findAll(user: User, personal: boolean) {
+    const usr: User = await this.userService.findOne(user);
     try {
-      const usr: User = await this.userService.findOne(user);
       const userId: string = usr.id;
       const groupId: string = usr.id;
 
@@ -90,7 +125,7 @@ export class TransactionsService {
         order: [["date", "DESC"]],
       });
     } catch (err) {
-      throw new Error(err);
+      throw new HttpException(FIND_TRANSACTIONS_ERROR, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -100,8 +135,8 @@ export class TransactionsService {
     page: number,
     limit: number,
   ) {
+    const usr: User = await this.userService.findOne(user);
     try {
-      const usr: User = await this.userService.findOne(user);
       const userId: string = usr.id;
       const groupId: string = usr.id;
 
@@ -117,7 +152,7 @@ export class TransactionsService {
         order: [["date", "DESC"]],
       });
     } catch (err) {
-      throw new Error(err);
+      throw new HttpException(FIND_TRANSACTIONS_ERROR, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -132,38 +167,42 @@ export class TransactionsService {
   ) {
     const offset: number = (page - 1) * limit;
     const usr: User = await this.userService.findOne(user);
-    const userId: string = usr.id;
-    const groupId: string = usr.id;
+    try {
+      const userId: string = usr.id;
+      const groupId: string = usr.id;
 
-    const whereQuery = {
-      personal,
-      [personal ? "userId" : "groupId"]: personal ? userId : groupId,
-      date: {
-        [Op.and]: [
-          { [Op.gte]: `${year}-${month}-01` },
-          {
-            [Op.lte]: `${year}-${month}-${this.getDaysInMonth(year, month)}`,
-          },
-        ],
-      },
-      category,
-    };
+      const whereQuery = {
+        personal,
+        [personal ? "userId" : "groupId"]: personal ? userId : groupId,
+        date: {
+          [Op.and]: [
+            { [Op.gte]: `${year}-${month}-01` },
+            {
+              [Op.lte]: `${year}-${month}-${this.getDaysInMonth(year, month)}`,
+            },
+          ],
+        },
+        category,
+      };
 
-    let sum: number = await this.transactionRepository.sum("sum", {
-      where: whereQuery,
-    });
-    const transactions = await this.transactionRepository.findAll({
-      where: whereQuery,
-      offset,
-      limit,
-      order: [["date", "DESC"]],
-    });
+      let sum: number = await this.transactionRepository.sum("sum", {
+        where: whereQuery,
+      });
+      const transactions = await this.transactionRepository.findAll({
+        where: whereQuery,
+        offset,
+        limit,
+        order: [["date", "DESC"]],
+      });
 
-    if (sum === null) {
-      sum = 0;
+      if (sum === null) {
+        sum = 0;
+      }
+
+      return { sum, transactions };
+    } catch (err) {
+      throw new HttpException(FIND_TRANSACTIONS_ERROR, HttpStatus.NOT_FOUND);
     }
-
-    return { sum, transactions };
   }
 
   async findInfo(
@@ -174,68 +213,77 @@ export class TransactionsService {
     year: number,
   ) {
     const usr: User = await this.userService.findOne(user);
-    const userId: string = usr.id;
-    const groupId: string = usr.id;
+    try {
+      const userId: string = usr.id;
+      const groupId: string = usr.id;
 
-    const whereQuery = {
-      personal,
-      kind,
-      [personal ? "userId" : "groupId"]: personal ? userId : groupId,
-      date: {
-        [Op.and]: [
-          { [Op.gte]: `${year}-${month}-01` },
-          {
-            [Op.lte]: `${year}-${month}-${this.getDaysInMonth(year, month)}`,
-          },
-        ],
-      },
-    };
-
-    const transactionsInfo = await this.transactionRepository.sequelize.query(
-      `
-    SELECT
-      category,
-      COUNT(*) AS count,
-      SUM(sum) AS sum
-    FROM
-      transaction
-    WHERE
-      personal = :personal AND
-      kind = :kind AND
-      ${personal ? "user_id" : "group_id"} = :id AND
-      date >= :start AND
-      date <= :end
-    GROUP BY
-      category
-  `,
-      {
-        replacements: {
-          personal: whereQuery.personal,
-          kind: whereQuery.kind,
-          id: personal ? userId : groupId,
-          start: `${year}-${month}-01`,
-          end: `${year}-${month}-${this.getDaysInMonth(year, month)}`,
+      const whereQuery = {
+        personal,
+        kind,
+        [personal ? "userId" : "groupId"]: personal ? userId : groupId,
+        date: {
+          [Op.and]: [
+            { [Op.gte]: `${year}-${month}-01` },
+            {
+              [Op.lte]: `${year}-${month}-${this.getDaysInMonth(year, month)}`,
+            },
+          ],
         },
-        type: QueryTypes.SELECT,
-      },
-    );
+      };
 
-    let sum: number = await this.transactionRepository.sum("sum", {
-      where: whereQuery,
-    });
+      const transactionsInfo = await this.transactionRepository.sequelize.query(
+        `
+      SELECT
+        category,
+        COUNT(*) AS count,
+        SUM(sum) AS sum
+      FROM
+        transaction
+      WHERE
+        personal = :personal AND
+        kind = :kind AND
+        ${personal ? "user_id" : "group_id"} = :id AND
+        date >= :start AND
+        date <= :end
+      GROUP BY
+        category
+    `,
+        {
+          replacements: {
+            personal: whereQuery.personal,
+            kind: whereQuery.kind,
+            id: personal ? userId : groupId,
+            start: `${year}-${month}-01`,
+            end: `${year}-${month}-${this.getDaysInMonth(year, month)}`,
+          },
+          type: QueryTypes.SELECT,
+        },
+      );
 
-    if (sum === null) {
-      sum = 0;
+      let sum: number = await this.transactionRepository.sum("sum", {
+        where: whereQuery,
+      });
+
+      if (sum === null) {
+        sum = 0;
+      }
+
+      return { sum, transactionsInfo };
+    } catch (err) {
+      throw new HttpException(FIND_INFO_ERROR, HttpStatus.NOT_FOUND);
     }
-
-    return { sum, transactionsInfo };
   }
 
-  async remove(user: User, id: string) {
+  async remove(user: User, id: string): Promise<boolean> {
     const usr: User = await this.userService.findOne(user);
-    const userId: string = usr.id;
+    try {
+      const userId: string = usr.id;
 
-    return this.transactionRepository.destroy({ where: { id, userId } });
+      await this.transactionRepository.destroy({ where: { id, userId } });
+      return true;
+    } catch (err) {
+      return;
+    }
   }
 
   private getDaysInMonth(year: number, month: Month): number {

@@ -11,20 +11,8 @@ import Group from "../../groups/models/group.model";
 import { User } from "../../users/models/user.model";
 import { Category, Kind } from "../transactions.constants";
 
-interface TransactionCreationAttrs {
-  sum: number;
-  category: Category;
-  kind: Kind;
-  date: Date;
-  time: Date;
-  personal: boolean;
-  description: string;
-  userId: string;
-  groupId: string;
-}
-
-@Table({ tableName: "transaction", underscored: true })
-export class Transaction extends Model<Transaction, TransactionCreationAttrs> {
+@Table({ tableName: "transaction", underscored: true, timestamps: false })
+export class Transaction extends Model<Transaction> {
   @PrimaryKey
   @Column({
     type: DataType.UUID,
