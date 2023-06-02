@@ -10,14 +10,8 @@ import { User } from "../../users/models/user.model";
 import { Theme } from "../hints.constants";
 import { HintUsers } from "./hintUsers.model";
 
-interface HintCreationAttrs {
-  theme: Theme;
-  title: string;
-  text: string;
-}
-
 @Table({ tableName: "hint", underscored: true, timestamps: false })
-export class Hint extends Model<Hint, HintCreationAttrs> {
+export class Hint extends Model<Hint> {
   @PrimaryKey
   @Column({
     type: DataType.INTEGER,

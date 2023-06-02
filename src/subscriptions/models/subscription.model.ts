@@ -8,13 +8,8 @@ import {
 } from "sequelize-typescript";
 import { User } from "../../users/models/user.model";
 
-interface SubCreationAttrs {
-  endDate: Date;
-  active: boolean;
-}
-
 @Table({ tableName: "subscription", underscored: true })
-export class Subscription extends Model<Subscription, SubCreationAttrs> {
+export class Subscription extends Model<Subscription> {
   @PrimaryKey
   @Column({
     type: DataType.UUID,
