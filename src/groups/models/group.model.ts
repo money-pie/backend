@@ -13,7 +13,7 @@ interface GroupCreationAttrs {
   premium: boolean;
 }
 
-@Table({ tableName: "group", underscored: true })
+@Table({ tableName: "group", underscored: true, timestamps: false })
 export default class Group extends Model<Group, GroupCreationAttrs> {
   @PrimaryKey
   @Column({

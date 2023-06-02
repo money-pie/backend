@@ -33,9 +33,13 @@ export class DemoService {
     return transaction;
   }
 
-  async findAll() {
+  async findAll(personal: boolean) {
     try {
-      return Array.from(mapOfTransactions.values());
+      const transactions = Array.from(mapOfTransactions.values());
+      const filteredTransactions = transactions.filter(
+        (transaction) => transaction.personal === personal,
+      );
+      return filteredTransactions;
     } catch (err) {
       throw new HttpException(
         FIND_ALL_TRANSACTIONS_ERROR,

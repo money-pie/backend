@@ -274,12 +274,13 @@ export class TransactionsService {
     }
   }
 
-  async remove(user: User, id: string) {
+  async remove(user: User, id: string): Promise<boolean> {
     const usr: User = await this.userService.findOne(user);
     try {
       const userId: string = usr.id;
 
-      return this.transactionRepository.destroy({ where: { id, userId } });
+      await this.transactionRepository.destroy({ where: { id, userId } });
+      return true;
     } catch (err) {
       return;
     }

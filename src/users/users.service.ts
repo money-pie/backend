@@ -42,7 +42,7 @@ export class UsersService {
     }
   }
 
-  async setNotifications(user: User): Promise<any> {
+  async setNotifications(user: User): Promise<boolean> {
     const { notification } = await this.findOne(user);
     const turnedNotification = false;
     const data = {
@@ -52,9 +52,10 @@ export class UsersService {
       data.notification = turnedNotification;
     }
     try {
-      return this.userRepository.update(data, {
+      await this.userRepository.update(data, {
         where: { id: user.id },
       });
+      return data.notification;
     } catch (err) {
       throw new HttpException(
         NOTIFICATION_SETTINGS_ERROR,

@@ -62,15 +62,14 @@ export class HintsService {
 
       return user.hints;
     } catch (err) {
-      return;
+      return [];
     }
   }
 
-  async removeHintForUser(user: User, hintId: number): Promise<void> {
+  async removeHintForUser(user: User, hintId: number): Promise<boolean> {
     try {
       const usr: User = await this.userService.findOne(user);
       const userId: string = usr.id;
-      console.log("USER.ID = ", userId);
       const hintUser = await this.hintUsersModel.findOne({
         where: {
           hintId,
@@ -82,6 +81,7 @@ export class HintsService {
       }
 
       await hintUser.destroy();
+      return true;
     } catch (err) {
       return;
     }

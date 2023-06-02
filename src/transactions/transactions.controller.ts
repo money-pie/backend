@@ -16,15 +16,36 @@ import { TransactionsService } from "./transactions.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 import { Category, Kind, Month } from "./transactions.constants";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
+import { ErrorResponse } from "src/exceptions/response/exceptions.responses";
+import {
+  InfoListResponse,
+  ListTransactionsResponse,
+  TransactionResponse,
+} from "./response/transactions.responses";
 
 @ApiTags("Transactions endpoints")
+@ApiBearerAuth()
 @Controller("transactions")
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @ApiOperation({ summary: "Add a transaction" })
   @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 201,
+    description: "Created transaction",
+    type: TransactionResponse,
+  })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
+  @ApiResponse({ status: 404, type: ErrorResponse })
   @Post("/add")
   create(@Req() req, @Body() createTransactionDto: CreateTransactionDto) {
     const user = req.user;
@@ -38,6 +59,14 @@ export class TransactionsController {
     type: String,
     description: "Transaction id",
   })
+  @ApiResponse({
+    status: 200,
+    description: "Found transaction",
+    type: TransactionResponse,
+  })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
+  @ApiResponse({ status: 404, type: ErrorResponse })
   @Get("/:id")
   findOne(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
     const user = req.user;
@@ -52,6 +81,14 @@ export class TransactionsController {
     description: "Personal or group transactions",
     example: true,
   })
+  @ApiResponse({
+    status: 200,
+    description: "List of transactions",
+    type: [TransactionResponse],
+  })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
+  @ApiResponse({ status: 404, type: ErrorResponse })
   @Get("/all/:personal")
   findAll(@Req() req, @Param("personal", ParseBoolPipe) personal: boolean) {
     const user = req.user;
@@ -77,6 +114,14 @@ export class TransactionsController {
     description: "Limit post per page",
     example: 5,
   })
+  @ApiResponse({
+    status: 200,
+    description: "List of transactions with pagination",
+    type: [TransactionResponse],
+  })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
+  @ApiResponse({ status: 404, type: ErrorResponse })
   @Get("/all-pag/:personal/:page/:limit")
   findAllPagination(
     @Req() req,
@@ -133,6 +178,14 @@ export class TransactionsController {
     description: "Year to filter",
     example: 2023,
   })
+  @ApiResponse({
+    status: 200,
+    description: "Filtered list of transactions with pagination",
+    type: ListTransactionsResponse,
+  })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
+  @ApiResponse({ status: 404, type: ErrorResponse })
   @Get("/sort/:personal/:page/:limit/:category/:month/:year")
   findAllFiltered(
     @Req() req,
@@ -181,6 +234,14 @@ export class TransactionsController {
     description: "Year to filter",
     example: 2023,
   })
+  @ApiResponse({
+    status: 200,
+    description: "List of transactions info",
+    type: InfoListResponse,
+  })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
+  @ApiResponse({ status: 404, type: ErrorResponse })
   @Get("/categories-info/:personal/:kind/:month/:year")
   findInfo(
     @Req() req,
@@ -200,6 +261,10 @@ export class TransactionsController {
     type: String,
     description: "Transaction id to deleting",
   })
+  @ApiResponse({ status: 200, type: Boolean })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
+  @ApiResponse({ status: 404, type: ErrorResponse })
   @Delete("/:id")
   deleteCosts(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
     const user = req.user;

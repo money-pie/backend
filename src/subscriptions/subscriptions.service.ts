@@ -44,10 +44,11 @@ export class SubscriptionsService {
     }
   }
 
-  async unsub(user: User) {
+  async unsub(user: User): Promise<boolean> {
     const usr: User = await this.userService.findOne(user);
     try {
-      return this.subRepository.destroy({ where: { id: usr.subId } });
+      this.subRepository.destroy({ where: { id: usr.subId } });
+      return true;
     } catch (err) {
       throw new HttpException(UNSUB_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
     }

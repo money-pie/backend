@@ -12,11 +12,11 @@ async function bootstrap() {
     .setTitle("MoneyPie API")
     .setDescription("MoneyPie app REST API documentation")
     .setVersion("0.1")
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("/api/docs", app, document);
-  app.useGlobalPipes(new ValidationPipe());
   await app.listen(PORT);
 }
 bootstrap();

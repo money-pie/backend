@@ -7,9 +7,16 @@ import {
   ParseIntPipe,
   ParseUUIDPipe,
 } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ErrorResponse } from "src/exceptions/response/exceptions.responses";
 import { Category, Kind, Month } from "src/transactions/transactions.constants";
 import { DemoService } from "./demo.service";
+import {
+  DemoInfoListResponse,
+  DemoListTransactionsResponse,
+  DemoTransactionResponse,
+  DemoUserResponse,
+} from "./response/demo.responses";
 
 @ApiTags("Demo endpoints")
 @Controller("demo")
@@ -17,6 +24,12 @@ export class DemoController {
   constructor(private readonly demoService: DemoService) {}
 
   @ApiOperation({ summary: "Get demo user" })
+  @ApiResponse({
+    status: 200,
+    description: "Demo user info",
+    type: DemoUserResponse,
+  })
+  @ApiResponse({ status: 404, type: ErrorResponse })
   @Get("/user")
   findUsr() {
     return this.demoService.findOneUsr();
@@ -28,6 +41,13 @@ export class DemoController {
     type: String,
     description: "Transaction id",
   })
+  @ApiResponse({
+    status: 200,
+    description: "Demo transaction",
+    type: DemoTransactionResponse,
+  })
+  @ApiResponse({ status: 404, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
   @Get("/:id")
   findOne(@Param("id", ParseUUIDPipe) id: string) {
     return this.demoService.findOneById(id);
@@ -40,9 +60,16 @@ export class DemoController {
     description: "Personal or group transaction to show",
     example: true,
   })
+  @ApiResponse({
+    status: 200,
+    description: "List of demo transactions",
+    type: [DemoTransactionResponse],
+  })
+  @ApiResponse({ status: 404, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
   @Get("/all/:personal")
   findAll(@Param("personal", ParseBoolPipe) personal: boolean) {
-    return this.demoService.findAll();
+    return this.demoService.findAll(personal);
   }
 
   @ApiOperation({
@@ -72,6 +99,13 @@ export class DemoController {
     description: "Year to filter",
     example: 2023,
   })
+  @ApiResponse({
+    status: 200,
+    description: "Filtered list of demo transactions",
+    type: DemoListTransactionsResponse,
+  })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
   @Get("/sort/:personal/:category/:month/:year")
   findAllFiltered(
     @Param("personal", ParseBoolPipe) personal: boolean,
@@ -107,6 +141,13 @@ export class DemoController {
     description: "Year to filter",
     example: 2023,
   })
+  @ApiResponse({
+    status: 200,
+    description: "List of demo transactions info",
+    type: DemoInfoListResponse,
+  })
+  @ApiResponse({ status: 500, type: ErrorResponse })
+  @ApiResponse({ status: 400, type: ErrorResponse })
   @Get("/categories-info/:personal/:kind/:month/:year")
   findInfo(
     @Param("personal", ParseBoolPipe) personal: boolean,

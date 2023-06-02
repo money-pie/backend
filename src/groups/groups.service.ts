@@ -92,7 +92,7 @@ export class GroupsService {
     });
   }
 
-  async exit(user: User) {
+  async exit(user: User): Promise<boolean> {
     const usr: User = await this.userService.findOne(user);
     const id: string = usr.groupId;
     const group = await this.findOne(id);
@@ -105,7 +105,8 @@ export class GroupsService {
 
     try {
       if (data.curCapacity <= 1) {
-        return this.groupRepository.destroy({ where: { id } });
+        await this.groupRepository.destroy({ where: { id } });
+        return true;
       }
     } catch (err) {
       throw new HttpException(EXIT_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -114,7 +115,8 @@ export class GroupsService {
     this.userService.updateGroup(null, usr.id);
 
     try {
-      return this.groupRepository.update(data, { where: { id } });
+      await this.groupRepository.update(data, { where: { id } });
+      return true;
     } catch (err) {
       throw new HttpException(EXIT_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
     }
