@@ -1,5 +1,10 @@
 export const EXCESSING_CATEGORIES =
   "Превышено количество категорий. Оформите премиум-подписку.";
+export const CREATE_TRANSACTION_ERROR =
+  "Ошибка при создании транзакции, попробуйте позже.";
+export const FIND_TRANSACTION_ERROR = "Транзакции с таким id не найдена.";
+export const FIND_TRANSACTIONS_ERROR = "Транзакции не найдены.";
+export const FIND_INFO_ERROR = "Информация о транзакциях не найдена.";
 
 export enum Category {
   PRODUCTS = "Продукты",

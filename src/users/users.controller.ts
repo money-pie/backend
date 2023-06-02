@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Body,
   Patch,
   UseGuards,
   Req,
@@ -10,7 +9,7 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("User endpoints")
 @Controller("users")
@@ -35,6 +34,18 @@ export class UsersController {
 
   @ApiOperation({ summary: "Set personal budget aim" })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "sum",
+    type: Number,
+    description: "Aim sum per month",
+    example: 45000,
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Successful response",
+    type: Boolean,
+  })
+  @ApiResponse({ status: 500, description: "Internal server error" })
   @Patch("/aim/:sum")
   setAim(@Req() req, @Param("sum", ParseIntPipe) aim: number) {
     const user = req.user;

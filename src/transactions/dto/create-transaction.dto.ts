@@ -4,7 +4,7 @@ import { Category, Kind } from "../transactions.constants";
 
 export class CreateTransactionDto {
   @ApiProperty({
-    example: "4300",
+    example: 4300,
     description: "Transaction sum",
     nullable: false,
   })
@@ -28,15 +28,15 @@ export class CreateTransactionDto {
   readonly kind: Kind;
 
   @ApiProperty({
-    example: "YYYY-MM-DD",
-    description: "Transaction date",
+    example: "2023-05-18",
+    description: "Transaction date in YYYY-MM-DD format",
     nullable: false,
   })
   @IsDateString()
   readonly date: Date;
 
   @ApiProperty({
-    example: "true",
+    example: true,
     description: "Personal or by group",
     nullable: false,
   })

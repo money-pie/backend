@@ -13,7 +13,7 @@ import {
 import { GroupsService } from "./groups.service";
 import { CreateGroupDto } from "./dto/create-group.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("Group endpoints")
 @Controller("groups")
@@ -38,6 +38,12 @@ export class GroupsController {
 
   @ApiOperation({ summary: "Set aim for group`s budget" })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "sum",
+    type: Number,
+    description: "Aim sum per month for group",
+    example: 63500,
+  })
   @Patch("/aim/:sum")
   setAim(@Req() req, @Param("sum", ParseIntPipe) aim: number) {
     const user = req.user;
@@ -46,6 +52,11 @@ export class GroupsController {
 
   @ApiOperation({ summary: "Find group by id" })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "id",
+    type: String,
+    description: "Group id",
+  })
   @Get("/find/:id")
   findOne(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
     const user = req.user;

@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { UsersService } from "src/users/users.service";
 import { User } from "../users/models/user.model";
+import { FIND_HINT_ERROR, FIND_USER_ERROR } from "./hints.constants";
 import { Hint } from "./models/hint.models";
 import { HintUsers } from "./models/hintUsers.model";
 
@@ -18,95 +19,119 @@ export class HintsService {
   ) {}
 
   async createHintForUser(userId: string) {
-    const hintId: number = await this.getRandomEntityId(userId);
-    if (!hintId) {
+    try {
+      const hintId: number = await this.getRandomEntityId(userId);
+      if (!hintId) {
+        throw new HttpException(FIND_HINT_ERROR, HttpStatus.NOT_FOUND);
+      }
+
+      const user = await this.userModel.findByPk(userId);
+      if (!user) {
+        throw new HttpException(FIND_USER_ERROR, HttpStatus.NOT_FOUND);
+      }
+
+      const hint = await this.hintModel.findByPk(hintId);
+      if (!hint) {
+        throw new HttpException(FIND_HINT_ERROR, HttpStatus.NOT_FOUND);
+      }
+
+      await this.hintUsersModel.create({
+        hintId,
+        userId,
+      });
+    } catch (err) {
       return;
     }
-
-    const user = await this.userModel.findByPk(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const hint = await this.hintModel.findByPk(hintId);
-    if (!hint) {
-      throw new Error("Hint not found");
-    }
-
-    await this.hintUsersModel.create({
-      hintId,
-      userId,
-    });
   }
 
   async findAllHintsForUser(usr: User): Promise<Hint[]> {
-    const { id } = await this.userService.findOne(usr);
+    try {
+      const { id } = await this.userService.findOne(usr);
 
-    const user = await this.userModel.findByPk(id, {
-      include: [
-        {
-          model: Hint,
-          through: { attributes: [] },
-        },
-      ],
-    });
-    if (!user) {
-      throw new Error("User not found");
+      const user = await this.userModel.findByPk(id, {
+        include: [
+          {
+            model: Hint,
+            through: { attributes: [] },
+          },
+        ],
+      });
+      if (!user) {
+        throw new HttpException(FIND_USER_ERROR, HttpStatus.NOT_FOUND);
+      }
+
+      return user.hints;
+    } catch (err) {
+      return;
     }
-
-    return user.hints;
   }
 
   async removeHintForUser(user: User, hintId: number): Promise<void> {
-    const usr: User = await this.userService.findOne(user);
-    const userId: string = usr.id;
-    console.log("USER.ID = ", userId);
-    const hintUser = await this.hintUsersModel.findOne({
-      where: {
-        hintId,
-        userId,
-      },
-    });
-    if (!hintUser) {
-      throw new Error("HintUser not found");
-    }
+    try {
+      const usr: User = await this.userService.findOne(user);
+      const userId: string = usr.id;
+      console.log("USER.ID = ", userId);
+      const hintUser = await this.hintUsersModel.findOne({
+        where: {
+          hintId,
+          userId,
+        },
+      });
+      if (!hintUser) {
+        throw new HttpException(FIND_HINT_ERROR, HttpStatus.NOT_FOUND);
+      }
 
-    await hintUser.destroy();
+      await hintUser.destroy();
+    } catch (err) {
+      return;
+    }
   }
 
   private async getRandomEntityId(userId: string): Promise<number> {
-    const excludedIds: number[] = await this.getUniqueHintId(userId);
-    const n: number = await this.countHints();
-    const allEntityIds: number[] = Array.from(
-      { length: n },
-      (_, index) => index + 1,
-    );
-    const availableIds: number[] = allEntityIds.filter(
-      (id) => !excludedIds.includes(id),
-    );
+    try {
+      const excludedIds: number[] = await this.getUniqueHintId(userId);
+      const n: number = await this.countHints();
+      const allEntityIds: number[] = Array.from(
+        { length: n },
+        (_, index) => index + 1,
+      );
+      const availableIds: number[] = allEntityIds.filter(
+        (id) => !excludedIds.includes(id),
+      );
 
-    if (availableIds.length === 0) {
-      return null;
+      if (availableIds.length === 0) {
+        return null;
+      }
+
+      const randomIndex = Math.floor(Math.random() * availableIds.length);
+      return availableIds[randomIndex];
+    } catch (err) {
+      return;
     }
-
-    const randomIndex = Math.floor(Math.random() * availableIds.length);
-    return availableIds[randomIndex];
   }
 
   private async getUniqueHintId(userId: string): Promise<number[]> {
-    const hintUsers = await this.hintUsersModel.findAll({
-      where: {
-        userId: userId,
-      },
-      attributes: ["hintId"],
-      group: ["hintId"],
-    });
+    try {
+      const hintUsers = await this.hintUsersModel.findAll({
+        where: {
+          userId: userId,
+        },
+        attributes: ["hintId"],
+        group: ["hintId"],
+      });
 
-    const uniqueHintIds = hintUsers.map((hintUser) => hintUser.hintId);
-    return uniqueHintIds;
+      const uniqueHintIds = hintUsers.map((hintUser) => hintUser.hintId);
+      return uniqueHintIds;
+    } catch (err) {
+      return [];
+    }
   }
 
   private async countHints(): Promise<number> {
-    return await this.hintModel.count();
+    try {
+      return await this.hintModel.count();
+    } catch (err) {
+      return 0;
+    }
   }
 }

@@ -1,5 +1,11 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
+import { FIND_TRANSACTION_ERROR } from "src/demo/demo.constants";
 import { User } from "../users/models/user.model";
 import { UsersService } from "../users/users.service";
 import { CreateGroupDto } from "./dto/create-group.dto";
@@ -7,6 +13,10 @@ import {
   USER_ALREADY_IN_GROUP,
   USER_NOT_FOUND_ERROR,
   FULL_GROUP_ERROR,
+  AIM_ERROR,
+  DEFAULT_CAPACITY,
+  PREMIUM_CAPACITY,
+  EXIT_ERROR,
 } from "./groups.constants";
 import Group from "./models/group.model";
 
@@ -34,10 +44,10 @@ export class GroupsService {
     }
 
     if (groupId === null) {
-      let max = 3;
+      let max: number = DEFAULT_CAPACITY;
       let premium = false;
       if (usr.subId !== null || candidate.subId !== null) {
-        max = 5;
+        max = PREMIUM_CAPACITY;
         premium = true;
       }
 
@@ -61,7 +71,7 @@ export class GroupsService {
     const hasNonNullSubId = group.users.some((user) => user.subId !== null);
 
     if (hasNonNullSubId) {
-      max = 5;
+      max = PREMIUM_CAPACITY;
       premium = true;
     }
 
@@ -93,26 +103,44 @@ export class GroupsService {
       curCapacity: curCapacity - 1,
     };
 
-    if (data.curCapacity <= 1) {
-      return this.groupRepository.destroy({ where: { id } });
+    try {
+      if (data.curCapacity <= 1) {
+        return this.groupRepository.destroy({ where: { id } });
+      }
+    } catch (err) {
+      throw new HttpException(EXIT_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     this.userService.updateGroup(null, usr.id);
-    return this.groupRepository.update(data, { where: { id } });
+
+    try {
+      return this.groupRepository.update(data, { where: { id } });
+    } catch (err) {
+      throw new HttpException(EXIT_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async findOne(groupId: string) {
-    const id = groupId;
-    return this.groupRepository.findOne({
-      where: { id },
-      include: ["users"],
-    });
+    try {
+      const id = groupId;
+      return this.groupRepository.findOne({
+        where: { id },
+        include: ["users"],
+      });
+    } catch (err) {
+      throw new HttpException(FIND_TRANSACTION_ERROR, HttpStatus.NOT_FOUND);
+    }
   }
 
-  async setAim(user: User, aim: number) {
+  async setAim(user: User, aim: number): Promise<boolean> {
     const usr: User = await this.userService.findOne(user);
     const id: string = usr.groupId;
 
-    return this.groupRepository.update({ aim: aim }, { where: { id } });
+    try {
+      this.groupRepository.update({ aim: aim }, { where: { id } });
+      return true;
+    } catch (err) {
+      throw new HttpException(AIM_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

@@ -16,7 +16,7 @@ import { TransactionsService } from "./transactions.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 import { Category, Kind, Month } from "./transactions.constants";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("Transactions endpoints")
 @Controller("transactions")
@@ -33,6 +33,11 @@ export class TransactionsController {
 
   @ApiOperation({ summary: "Get transaction by id" })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "id",
+    type: String,
+    description: "Transaction id",
+  })
   @Get("/:id")
   findOne(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
     const user = req.user;
@@ -41,6 +46,12 @@ export class TransactionsController {
 
   @ApiOperation({ summary: "Get list of transactions" })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "personal",
+    type: Boolean,
+    description: "Personal or group transactions",
+    example: true,
+  })
   @Get("/all/:personal")
   findAll(@Req() req, @Param("personal", ParseBoolPipe) personal: boolean) {
     const user = req.user;
@@ -49,6 +60,23 @@ export class TransactionsController {
 
   @ApiOperation({ summary: "Get list of transactions with pagination" })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "personal",
+    type: Boolean,
+    description: "Personal or group transactions",
+  })
+  @ApiParam({
+    name: "page",
+    type: Number,
+    description: "Number of page",
+    example: 1,
+  })
+  @ApiParam({
+    name: "limit",
+    type: Number,
+    description: "Limit post per page",
+    example: 5,
+  })
   @Get("/all-pag/:personal/:page/:limit")
   findAllPagination(
     @Req() req,
@@ -69,6 +97,42 @@ export class TransactionsController {
     summary: "Get filtered list of transactions with pagination",
   })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "personal",
+    type: Boolean,
+    description: "Personal or group transactions",
+    example: true,
+  })
+  @ApiParam({
+    name: "page",
+    type: Number,
+    description: "Number of page",
+    example: 1,
+  })
+  @ApiParam({
+    name: "limit",
+    type: Number,
+    description: "Limit post per page",
+    example: 5,
+  })
+  @ApiParam({
+    name: "category",
+    type: String,
+    description: "Category of transaction",
+    example: "Продукты",
+  })
+  @ApiParam({
+    name: "month",
+    type: String,
+    description: "Month in MM format",
+    example: "05",
+  })
+  @ApiParam({
+    name: "year",
+    type: Number,
+    description: "Year to filter",
+    example: 2023,
+  })
   @Get("/sort/:personal/:page/:limit/:category/:month/:year")
   findAllFiltered(
     @Req() req,
@@ -93,6 +157,30 @@ export class TransactionsController {
 
   @ApiOperation({ summary: "Get info about transactions with filters" })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "personal",
+    type: Boolean,
+    description: "Personal or group transaction to show",
+    example: true,
+  })
+  @ApiParam({
+    name: "kind",
+    type: String,
+    description: "Income or hosts",
+    example: "Расходы",
+  })
+  @ApiParam({
+    name: "month",
+    type: String,
+    description: "Month in MM format",
+    example: "05",
+  })
+  @ApiParam({
+    name: "year",
+    type: Number,
+    description: "Year to filter",
+    example: 2023,
+  })
   @Get("/categories-info/:personal/:kind/:month/:year")
   findInfo(
     @Req() req,
@@ -107,6 +195,11 @@ export class TransactionsController {
 
   @ApiOperation({ summary: "Delete transaction" })
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: "id",
+    type: String,
+    description: "Transaction id to deleting",
+  })
   @Delete("/:id")
   deleteCosts(@Req() req, @Param("id", ParseUUIDPipe) id: string) {
     const user = req.user;

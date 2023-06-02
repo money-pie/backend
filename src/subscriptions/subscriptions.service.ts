@@ -1,9 +1,14 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException } from "@nestjs/common/exceptions";
 import { InjectModel } from "@nestjs/sequelize";
 import { User } from "../users/models/user.model";
 import { UsersService } from "../users/users.service";
 import { Subscription } from "./models/subscription.model";
-import { ALREADY_PREMIUM } from "./subscriptions.constants";
+import {
+  ALREADY_PREMIUM,
+  SUB_ERROR,
+  UNSUB_ERROR,
+} from "./subscriptions.constants";
 
 @Injectable()
 export class SubscriptionsService {
@@ -29,14 +34,22 @@ export class SubscriptionsService {
       active: true,
     };
 
-    const response = await this.subRepository.create(data);
-    this.userService.updateSub(response.id, userId);
+    try {
+      const response = await this.subRepository.create(data);
+      this.userService.updateSub(response.id, userId);
 
-    return response;
+      return response;
+    } catch (err) {
+      throw new HttpException(SUB_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async unsub(user: User) {
     const usr: User = await this.userService.findOne(user);
-    return this.subRepository.destroy({ where: { id: usr.subId } });
+    try {
+      return this.subRepository.destroy({ where: { id: usr.subId } });
+    } catch (err) {
+      throw new HttpException(UNSUB_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
