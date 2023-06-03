@@ -9,7 +9,14 @@ import {
 } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ErrorResponse } from "src/exceptions/response/exceptions.responses";
-import { Category, Kind, Month } from "src/transactions/transactions.constants";
+import {
+  Category,
+  EngCategory,
+  EngKind,
+  EngMonth,
+  Kind,
+  Month,
+} from "src/transactions/transactions.constants";
 import { DemoService } from "./demo.service";
 import {
   DemoInfoListResponse,
@@ -85,13 +92,13 @@ export class DemoController {
     name: "category",
     type: String,
     description: "Category of transaction",
-    example: "Продукты",
+    example: "products",
   })
   @ApiParam({
     name: "month",
     type: String,
-    description: "Month in MM format",
-    example: "05",
+    description: "The first three letters of the month",
+    example: "may",
   })
   @ApiParam({
     name: "year",
@@ -109,8 +116,8 @@ export class DemoController {
   @Get("/sort/:personal/:category/:month/:year")
   findAllFiltered(
     @Param("personal", ParseBoolPipe) personal: boolean,
-    @Param("category", new ParseEnumPipe(Category)) category: Category,
-    @Param("month", new ParseEnumPipe(Month)) month: Month,
+    @Param("category", new ParseEnumPipe(EngCategory)) category: EngCategory,
+    @Param("month", new ParseEnumPipe(EngMonth)) month: EngMonth,
     @Param("year", ParseIntPipe) year: number,
   ) {
     return this.demoService.findAllFiltered(personal, category, month, year);
@@ -126,14 +133,14 @@ export class DemoController {
   @ApiParam({
     name: "kind",
     type: String,
-    description: "Income or hosts",
-    example: "Расходы",
+    description: "Income or costs",
+    example: "costs",
   })
   @ApiParam({
     name: "month",
     type: String,
-    description: "Month in MM format",
-    example: "05",
+    description: "The first three letters of the month",
+    example: "may",
   })
   @ApiParam({
     name: "year",
@@ -151,8 +158,8 @@ export class DemoController {
   @Get("/categories-info/:personal/:kind/:month/:year")
   findInfo(
     @Param("personal", ParseBoolPipe) personal: boolean,
-    @Param("kind", new ParseEnumPipe(Kind)) kind: Kind,
-    @Param("month", new ParseEnumPipe(Month)) month: Month,
+    @Param("kind", new ParseEnumPipe(EngKind)) kind: EngKind,
+    @Param("month", new ParseEnumPipe(EngMonth)) month: EngMonth,
     @Param("year", ParseIntPipe) year: number,
   ) {
     return this.demoService.findInfo(personal, kind, month, year);

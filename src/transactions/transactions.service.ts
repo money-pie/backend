@@ -19,6 +19,9 @@ import {
   FIND_TRANSACTION_ERROR,
   FIND_TRANSACTIONS_ERROR,
   FIND_INFO_ERROR,
+  EngCategory,
+  EngKind,
+  EngMonth,
 } from "./transactions.constants";
 
 @Injectable()
@@ -161,13 +164,16 @@ export class TransactionsService {
     personal: boolean,
     page: number,
     limit: number,
-    category: Category,
-    month: Month,
+    engCategory: EngCategory,
+    engMonth: EngMonth,
     year: number,
   ) {
     const offset: number = (page - 1) * limit;
     const usr: User = await this.userService.findOne(user);
     try {
+      const category: Category = await this.convertCategory(engCategory);
+      const month: Month = await this.convertMonth(engMonth);
+
       const userId: string = usr.id;
       const groupId: string = usr.id;
 
@@ -208,12 +214,15 @@ export class TransactionsService {
   async findInfo(
     user: User,
     personal: boolean,
-    kind: Kind,
-    month: Month,
+    engKind: EngKind,
+    engMonth: EngMonth,
     year: number,
   ) {
     const usr: User = await this.userService.findOne(user);
     try {
+      const kind: Kind = await this.convertKind(engKind);
+      const month: Month = await this.convertMonth(engMonth);
+
       const userId: string = usr.id;
       const groupId: string = usr.id;
 
@@ -300,6 +309,75 @@ export class TransactionsService {
       }
     } else {
       return 30 + ((monthNumber + (monthNumber >> 3)) & 1);
+    }
+  }
+
+  private async convertMonth(month: EngMonth): Promise<Month> {
+    const monthEnum: Record<EngMonth, Month> = {
+      jan: Month.JANUARY,
+      feb: Month.FEBRUARY,
+      mar: Month.MARCH,
+      apr: Month.APRIL,
+      may: Month.MAY,
+      jun: Month.JUNE,
+      jul: Month.JULY,
+      aug: Month.AUGUST,
+      sep: Month.SEPTEMBER,
+      oct: Month.OCTOBER,
+      nov: Month.NOVEMBER,
+      dec: Month.DECEMBER,
+    };
+
+    const monthNumber = monthEnum[month];
+
+    if (monthNumber) {
+      return monthNumber;
+    } else {
+      throw new Error("Invalid month name or abbreviation.");
+    }
+  }
+
+  private async convertKind(kind: EngKind): Promise<Kind> {
+    switch (kind) {
+      case EngKind.COSTS:
+        return Kind.COSTS;
+      case EngKind.INCOME:
+        return Kind.INCOME;
+      default:
+        throw new Error("Invalid kind.");
+    }
+  }
+
+  private async convertCategory(category: EngCategory): Promise<Category> {
+    switch (category) {
+      case EngCategory.PRODUCTS:
+        return Category.PRODUCTS;
+      case EngCategory.ENTERTAINMENT:
+        return Category.ENTERTAINMENT;
+      case EngCategory.TRANSPORT:
+        return Category.TRANSPORT;
+      case EngCategory.HEALTH:
+        return Category.HEALTH;
+      case EngCategory.HOME:
+        return Category.HOME;
+      case EngCategory.EDUCATION:
+        return Category.EDUCATION;
+      case EngCategory.FITNESS:
+        return Category.FITNESS;
+      case EngCategory.TAXES:
+        return Category.TAXES;
+      case EngCategory.SALARY:
+        return Category.SALARY;
+      case EngCategory.REWARD:
+        return Category.REWARD;
+      case EngCategory.PRESENT:
+        return Category.PRESENT;
+      case EngCategory.SALES:
+        return Category.SALES;
+      case EngCategory.OTHER:
+        return Category.OTHER;
+      default:
+        throw new Error("Invalid category.");
     }
   }
 }

@@ -15,7 +15,14 @@ import {
 import { TransactionsService } from "./transactions.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
-import { Category, Kind, Month } from "./transactions.constants";
+import {
+  Category,
+  EngCategory,
+  EngKind,
+  EngMonth,
+  Kind,
+  Month,
+} from "./transactions.constants";
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -164,13 +171,13 @@ export class TransactionsController {
     name: "category",
     type: String,
     description: "Category of transaction",
-    example: "Продукты",
+    example: "products",
   })
   @ApiParam({
     name: "month",
     type: String,
-    description: "Month in MM format",
-    example: "05",
+    description: "The first three letters of the month",
+    example: "may",
   })
   @ApiParam({
     name: "year",
@@ -192,8 +199,8 @@ export class TransactionsController {
     @Param("personal", ParseBoolPipe) personal: boolean,
     @Param("page", ParseIntPipe) page: number,
     @Param("limit", ParseIntPipe) limit: number,
-    @Param("category", new ParseEnumPipe(Category)) category: Category,
-    @Param("month", new ParseEnumPipe(Month)) month: Month,
+    @Param("category", new ParseEnumPipe(EngCategory)) category: EngCategory,
+    @Param("month", new ParseEnumPipe(EngMonth)) month: EngMonth,
     @Param("year", ParseIntPipe) year: number,
   ) {
     const user = req.user;
@@ -219,14 +226,14 @@ export class TransactionsController {
   @ApiParam({
     name: "kind",
     type: String,
-    description: "Income or hosts",
-    example: "Расходы",
+    description: "Income or costs",
+    example: "costs",
   })
   @ApiParam({
     name: "month",
     type: String,
-    description: "Month in MM format",
-    example: "05",
+    description: "The first three letters of the month",
+    example: "may",
   })
   @ApiParam({
     name: "year",
@@ -246,8 +253,8 @@ export class TransactionsController {
   findInfo(
     @Req() req,
     @Param("personal", ParseBoolPipe) personal: boolean,
-    @Param("kind", new ParseEnumPipe(Kind)) kind: Kind,
-    @Param("month", new ParseEnumPipe(Month)) month: Month,
+    @Param("kind", new ParseEnumPipe(EngKind)) kind: EngKind,
+    @Param("month", new ParseEnumPipe(EngMonth)) month: EngMonth,
     @Param("year", ParseIntPipe) year: number,
   ) {
     const user = req.user;

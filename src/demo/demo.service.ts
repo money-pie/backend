@@ -4,7 +4,14 @@ import {
   HttpStatus,
   Injectable,
 } from "@nestjs/common";
-import { Category, Kind, Month } from "src/transactions/transactions.constants";
+import {
+  Category,
+  EngCategory,
+  EngKind,
+  EngMonth,
+  Kind,
+  Month,
+} from "src/transactions/transactions.constants";
 import {
   FIND_ALL_FILTERED_ERROR,
   FIND_ALL_TRANSACTIONS_ERROR,
@@ -50,11 +57,14 @@ export class DemoService {
 
   async findAllFiltered(
     personal: boolean,
-    category: Category,
-    month: Month,
+    engCategory: EngCategory,
+    engMonth: EngMonth,
     year: number,
   ) {
     try {
+      const category: Category = await this.convertCategory(engCategory);
+      const month: Month = await this.convertMonth(engMonth);
+
       const resultArr: MockTransaction[] = [];
       let sum = 0;
       const numMonth: number = parseInt(month, 10) - 1;
@@ -80,8 +90,16 @@ export class DemoService {
     }
   }
 
-  async findInfo(personal: boolean, kind: Kind, month: Month, year: number) {
+  async findInfo(
+    personal: boolean,
+    engKind: EngKind,
+    engMonth: EngMonth,
+    year: number,
+  ) {
     try {
+      const kind: Kind = await this.convertKind(engKind);
+      const month: Month = await this.convertMonth(engMonth);
+
       const resultArr: MockTransaction[] = [];
       let sum = 0;
       const numMonth: number = parseInt(month, 10) - 1;
@@ -129,6 +147,75 @@ export class DemoService {
       return { sum: sum, transactionsInfo: trArr };
     } catch (err) {
       throw new BadRequestException(FIND_INFO_ERROR);
+    }
+  }
+
+  private async convertMonth(month: EngMonth): Promise<Month> {
+    const monthEnum: Record<EngMonth, Month> = {
+      jan: Month.JANUARY,
+      feb: Month.FEBRUARY,
+      mar: Month.MARCH,
+      apr: Month.APRIL,
+      may: Month.MAY,
+      jun: Month.JUNE,
+      jul: Month.JULY,
+      aug: Month.AUGUST,
+      sep: Month.SEPTEMBER,
+      oct: Month.OCTOBER,
+      nov: Month.NOVEMBER,
+      dec: Month.DECEMBER,
+    };
+
+    const monthNumber = monthEnum[month];
+
+    if (monthNumber) {
+      return monthNumber;
+    } else {
+      throw new Error("Invalid month name or abbreviation.");
+    }
+  }
+
+  private async convertKind(kind: EngKind): Promise<Kind> {
+    switch (kind) {
+      case EngKind.COSTS:
+        return Kind.COSTS;
+      case EngKind.INCOME:
+        return Kind.INCOME;
+      default:
+        throw new Error("Invalid kind.");
+    }
+  }
+
+  private async convertCategory(category: EngCategory): Promise<Category> {
+    switch (category) {
+      case EngCategory.PRODUCTS:
+        return Category.PRODUCTS;
+      case EngCategory.ENTERTAINMENT:
+        return Category.ENTERTAINMENT;
+      case EngCategory.TRANSPORT:
+        return Category.TRANSPORT;
+      case EngCategory.HEALTH:
+        return Category.HEALTH;
+      case EngCategory.HOME:
+        return Category.HOME;
+      case EngCategory.EDUCATION:
+        return Category.EDUCATION;
+      case EngCategory.FITNESS:
+        return Category.FITNESS;
+      case EngCategory.TAXES:
+        return Category.TAXES;
+      case EngCategory.SALARY:
+        return Category.SALARY;
+      case EngCategory.REWARD:
+        return Category.REWARD;
+      case EngCategory.PRESENT:
+        return Category.PRESENT;
+      case EngCategory.SALES:
+        return Category.SALES;
+      case EngCategory.OTHER:
+        return Category.OTHER;
+      default:
+        throw new Error("Invalid category.");
     }
   }
 }
