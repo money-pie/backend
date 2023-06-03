@@ -22,6 +22,22 @@ export enum Category {
   OTHER = "Другое",
 }
 
+export enum EngCategory {
+  PRODUCTS = "products",
+  ENTERTAINMENT = "entertainment",
+  TRANSPORT = "transport",
+  HEALTH = "health",
+  HOME = "home",
+  EDUCATION = "education",
+  FITNESS = "fitness",
+  TAXES = "taxes",
+  SALARY = "salary",
+  REWARD = "reward",
+  PRESENT = "present",
+  SALES = "sales",
+  OTHER = "other",
+}
+
 export enum Month {
   JANUARY = "01",
   FEBRUARY = "02",
@@ -37,7 +53,27 @@ export enum Month {
   DECEMBER = "12",
 }
 
+export enum EngMonth {
+  JANUARY = "jan",
+  FEBRUARY = "feb",
+  MARCH = "mar",
+  APRIL = "apr",
+  MAY = "may",
+  JUNE = "jun",
+  JULY = "jul",
+  AUGUST = "aug",
+  SEPTEMBER = "sep",
+  OCTOBER = "oct",
+  NOVEMBER = "nov",
+  DECEMBER = "dec",
+}
+
 export enum Kind {
   COSTS = "Расходы",
   INCOME = "Доходы",
+}
+
+export enum EngKind {
+  COSTS = "costs",
+  INCOME = "income",
 }
