@@ -4,7 +4,7 @@ services:
   moneypie.api:
     env_file:
       - .env
-    image: pustart/money-pie-api:latest
+    image: pustart/money-pie-api-release:latest
     container_name: moneypie-api
     build: .
     restart: always
