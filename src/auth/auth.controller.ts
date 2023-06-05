@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ErrorResponse } from "src/exceptions/response/exceptions.responses";
 import { CreateUserDto } from "../users/dto/create-user.dto";
@@ -13,7 +13,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "User authorization" })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: "JWT was created",
     type: AuthUserResponse,
   })
@@ -22,13 +22,14 @@ export class AuthController {
   @ApiResponse({ status: 404, type: ErrorResponse })
   @ApiResponse({ status: 500, type: ErrorResponse })
   @Post("/login")
+  @HttpCode(HttpStatus.OK)
   login(@Body() userDto: LoginDto) {
     return this.authService.login(userDto);
   }
 
   @ApiOperation({ summary: "User registration" })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: "JWT was created",
     type: AuthUserResponse,
   })
@@ -37,6 +38,7 @@ export class AuthController {
   @ApiResponse({ status: 404, type: ErrorResponse })
   @ApiResponse({ status: 500, type: ErrorResponse })
   @Post("/registration")
+  @HttpCode(HttpStatus.OK)
   registration(@Body() userDto: CreateUserDto) {
     return this.authService.registration(userDto);
   }
