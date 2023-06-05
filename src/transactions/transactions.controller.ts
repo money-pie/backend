@@ -156,18 +156,6 @@ export class TransactionsController {
     example: true,
   })
   @ApiParam({
-    name: "page",
-    type: Number,
-    description: "Number of page",
-    example: 1,
-  })
-  @ApiParam({
-    name: "limit",
-    type: Number,
-    description: "Limit post per page",
-    example: 5,
-  })
-  @ApiParam({
     name: "category",
     type: String,
     description: "Category of transaction",
@@ -193,12 +181,10 @@ export class TransactionsController {
   @ApiResponse({ status: 500, type: ErrorResponse })
   @ApiResponse({ status: 400, type: ErrorResponse })
   @ApiResponse({ status: 404, type: ErrorResponse })
-  @Get("/sort/:personal/:page/:limit/:category/:month/:year")
+  @Get("/sort/:personal/:category/:month/:year")
   findAllFiltered(
     @Req() req,
     @Param("personal", ParseBoolPipe) personal: boolean,
-    @Param("page", ParseIntPipe) page: number,
-    @Param("limit", ParseIntPipe) limit: number,
     @Param("category", new ParseEnumPipe(EngCategory)) category: EngCategory,
     @Param("month", new ParseEnumPipe(EngMonth)) month: EngMonth,
     @Param("year", ParseIntPipe) year: number,
@@ -207,8 +193,6 @@ export class TransactionsController {
     return this.transactionsService.findAllFiltered(
       user,
       personal,
-      page,
-      limit,
       category,
       month,
       year,

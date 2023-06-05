@@ -117,7 +117,7 @@ export class TransactionsService {
     const usr: User = await this.userService.findOne(user);
     try {
       const userId: string = usr.id;
-      const groupId: string = usr.id;
+      const groupId: string = usr.groupId;
 
       const whereQuery = personal
         ? { personal, userId }
@@ -141,7 +141,7 @@ export class TransactionsService {
     const usr: User = await this.userService.findOne(user);
     try {
       const userId: string = usr.id;
-      const groupId: string = usr.id;
+      const groupId: string = usr.groupId;
 
       const whereQuery = personal
         ? { personal, userId }
@@ -162,20 +162,17 @@ export class TransactionsService {
   async findAllFiltered(
     user: User,
     personal: boolean,
-    page: number,
-    limit: number,
     engCategory: EngCategory,
     engMonth: EngMonth,
     year: number,
   ) {
-    const offset: number = (page - 1) * limit;
     const usr: User = await this.userService.findOne(user);
     try {
       const category: Category = await this.convertCategory(engCategory);
       const month: Month = await this.convertMonth(engMonth);
 
       const userId: string = usr.id;
-      const groupId: string = usr.id;
+      const groupId: string = usr.groupId;
 
       const whereQuery = {
         personal,
@@ -196,8 +193,6 @@ export class TransactionsService {
       });
       const transactions = await this.transactionRepository.findAll({
         where: whereQuery,
-        offset,
-        limit,
         order: [["date", "DESC"]],
       });
 
@@ -224,7 +219,7 @@ export class TransactionsService {
       const month: Month = await this.convertMonth(engMonth);
 
       const userId: string = usr.id;
-      const groupId: string = usr.id;
+      const groupId: string = usr.groupId;
 
       const whereQuery = {
         personal,
