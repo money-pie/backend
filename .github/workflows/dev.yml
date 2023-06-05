@@ -1,7 +1,7 @@
 name: Pipeline
 on:
   push:
-    branches: [ "release" ]
+    branches: [ "deploy/dev" ]
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -43,4 +43,4 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: pustart/money-pie-api:latest
+          tags: pustart/money-pie-api-dev:latest
